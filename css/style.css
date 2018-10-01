@@ -35,4 +35,7 @@ h2 {
 
 .main_content {
   width: 75%;
+  margin-top: 10px;
+  margin-left: 10px;
+  background-color: #a4aaae;
 }
