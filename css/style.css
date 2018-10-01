@@ -4,6 +4,7 @@ body {
 
 h2 {
   margin-top: 10px;
+  margin-bottom: 1px;
 }
 
 .heading {
@@ -31,6 +32,15 @@ h2 {
   background-color: #718eb1;
   text-align: center;
   color: #b8cf69;
+}
+
+.sidebar_line {
+  margin-left: 12.5%;
+  width: 75%;
+  align-content: center;
+  height: 1px;
+  border-top: 2px solid #b8cf69;
+  margin-bottom: 10px;
 }
 
 .main_content {
