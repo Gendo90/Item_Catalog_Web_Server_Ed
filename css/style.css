@@ -49,3 +49,9 @@ h2 {
   margin-left: 10px;
   background-color: #a4aaae;
 }
+
+@media only screen and (min-width: 800px) {
+  .main_content {
+    width: calc(100% - 210px);
+  }
+}
