@@ -2,6 +2,10 @@ body {
   background-color: lightgray;
 }
 
+h2 {
+  margin-top: 10px;
+}
+
 .heading {
   margin-top: 0px;
   padding-top: 3px;
@@ -10,4 +14,25 @@ body {
   text-align: center;
   color: #b8cf69;
   font-family: Arial;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+}
+
+.sidebar {
+  /*flex: initial;*/
+  width: 25%;
+  min-width: 120px;
+  max-width: 200px;
+  height: 85%;
+  margin-top: 10px;
+  background-color: #718eb1;
+  text-align: center;
+  color: #b8cf69;
+}
+
+.main_content {
+  width: 75%;
 }
