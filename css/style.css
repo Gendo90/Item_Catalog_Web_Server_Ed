@@ -7,6 +7,21 @@ h2 {
   margin-bottom: 1px;
 }
 
+h3 {
+  width: 120px;
+  height: 48px;
+}
+
+a {
+  color: #b8cf69;
+  text-decoration: none;
+  margin-right: auto;
+}
+
+a:hover {
+  color: lightgray;
+}
+
 .heading {
   margin-top: 0px;
   padding-top: 3px;
@@ -41,6 +56,10 @@ h2 {
   height: 1px;
   border-top: 2px solid #b8cf69;
   margin-bottom: 10px;
+}
+
+h3.sidebar_links {
+  margin: auto;
 }
 
 .main_content {
