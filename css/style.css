@@ -22,14 +22,27 @@ a:hover {
   color: lightgray;
 }
 
-.heading {
+.heading, .loggedinheading, .origheading {
   margin-top: 0px;
   padding-top: 3px;
   padding-bottom: 1px;
+  padding-left: 10px;
+  padding-right: 10px;
   background-color: #718eb1;
   text-align: center;
   color: #b8cf69;
   font-family: Arial;
+}
+
+.loggedinheading {
+  width: 10%
+  min-width: 90px;
+  max-width: 200px;
+}
+
+.origheading {
+  width: 100%;
+  text-align: match-parent;
 }
 
 .container {
