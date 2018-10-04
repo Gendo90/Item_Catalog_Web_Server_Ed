@@ -8,7 +8,30 @@ Base = declarative_base()
 
 #write code here!
 
+class Genre(Base):
+    __tablename__ = 'genre'
 
+    name = Column(
+    String(80), nullable = False)
+
+    id = Column(
+    Integer, primary_key = True)
+
+
+class BookItem(Base):
+    __tablename__ = 'book_item'
+
+    id = Column(Integer, primary_key = True)
+
+    title = Column(String(100))
+
+    author = Column(String(100))
+
+    description = Column(String(300))
+
+    genre_id = Column(Integer, ForeignKey('genre.id'))
+
+    genre = relationship(Genre)
 
 
 
