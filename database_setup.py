@@ -23,13 +23,13 @@ class BookItem(Base):
 
     id = Column(Integer, primary_key = True)
 
-    title = Column(String(100))
+    title = Column(String(100), nullable = False)
 
-    author = Column(String(100))
+    author = Column(String(100), nullable = False)
 
-    description = Column(String(300))
+    description = Column(String(600))
 
-    genre_id = Column(Integer, ForeignKey('genre.id'))
+    genre_id = Column(Integer, ForeignKey('genre.id'), nullable = False)
 
     genre = relationship(Genre)
 
