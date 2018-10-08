@@ -40,6 +40,10 @@ a:hover {
   max-width: 200px;
 }
 
+.text_blend {
+  color: #718eb1;
+}
+
 .origheading {
   width: 100%;
   text-align: match-parent;
