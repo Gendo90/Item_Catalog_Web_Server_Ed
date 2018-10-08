@@ -86,6 +86,16 @@ h3.sidebar_links {
   background-color: #a4aaae;
 }
 
+.login_box {
+  width: 300px;
+  height: 400px;
+  margin: auto;
+  margin-top: calc(50vh - 200px);
+  background-color: #718eb1;
+  text-align: center;
+  color: #b8cf69;
+}
+
 @media only screen and (min-width: 800px) {
   .main_content {
     width: calc(100% - 210px);
