@@ -22,6 +22,13 @@ a:hover {
   color: lightgray;
 }
 
+button {
+  background-color: lightgray;
+  color: black;
+  width: 48px;
+  height: 48px;
+}
+
 .heading, .loggedinheading, .origheading {
   margin-top: 0px;
   padding-top: 3px;
@@ -47,6 +54,10 @@ a:hover {
 .origheading {
   width: 100%;
   text-align: match-parent;
+}
+
+.header_btn {
+  margin-top: 60px;
 }
 
 .container {
@@ -117,5 +128,10 @@ h3.sidebar_links {
 @media only screen and (min-width: 800px) {
   .main_content {
     width: calc(100% - 210px);
+  }
+
+@media only screen and (max-width: 389px) {
+  .header_btn {
+    margin-top: 110px;
   }
 }

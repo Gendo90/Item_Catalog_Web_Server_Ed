@@ -14,7 +14,7 @@ session = DBSession()
 # Main page for the website
 @app.route('/')
 def mainPage():
-    return render_template('index.html')
+    return render_template('index-logged-in.html')
 
 # login page for the website
 @app.route('/login/')

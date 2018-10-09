@@ -3,6 +3,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
 
   <!-- Tells the browser what the title of this page should be. -->
   <title>Best Books Catalog</title>
@@ -12,13 +13,13 @@
   <meta name="website author" content="Patrick Gendotti">
 
   <!-- Load the page styles. -->
-  <link href=""{{url_for('static', filename='css/style.css')}}"" rel="stylesheet">
+  <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet">
 </head>
 <body>
   <div class=container>
     <div class=loggedinheading>
       <!--GHOST DIV FOR SPACING SO HEADER IS CENTERED!-->
-      <p class=text_blend>YOU are logged in!</p>
+      <p class=text_blend> Login </p>
     </div>
 
     <div class=origheading>
@@ -29,7 +30,7 @@
     </div>
 
     <div class=loggedinheading>
-      <p>YOU are logged in!</p>
+      <a href="{{url_for('loginPage')}}"><button class=header_btn type=button>Login</button></a>
     </div>
   </div>
 
