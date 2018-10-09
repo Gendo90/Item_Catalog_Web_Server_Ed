@@ -1,5 +1,6 @@
-body {
+html, body {
   background-color: lightgray;
+  height: 100%;
 }
 
 h2 {
@@ -65,12 +66,17 @@ button {
   flex-direction: row;
 }
 
+.main_container {
+  display: flex;
+  flex-direction: row;
+  height: 80%;
+}
+
 .sidebar {
   /*flex: initial;*/
   width: 25%;
   min-width: 120px;
   max-width: 200px;
-  height: 85%;
   margin-top: 10px;
   background-color: #718eb1;
   text-align: center;
