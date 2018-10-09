@@ -16,6 +16,10 @@ session = DBSession()
 def mainPage():
     return render_template('index.html')
 
+# login page for the website
+@app.route('/login/')
+def loginPage():
+    return render_template('login.html')
 
 # code from project.py listing books by genre
 @app.route("/genres/<int:genre_id>/")

@@ -11,7 +11,7 @@
   <meta name="website author" content="Patrick Gendotti">
 
   <!-- Load the page styles. -->
-  <link href="{{url_for('static', filename='css/style.css')}} rel="stylesheet">
+  <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet" type='text/css'>
 </head>
 <body>
   <div class=login_box>
@@ -19,13 +19,13 @@
       <h2>Google Login</h2>
       <div class=login_line></div>
       <br />
-      <img src= images/GG_Login_Button.jpg />
+      <img src= "{{url_for('static', filename='images/GG_Login_Button.jpg')}}" />
     </div>
     <div class=login_space>
       <h2>Facebook Login</h2>
       <div class=FB_login_line></div>
       <br />
-      <img src= images/FB_Login_Button.jpg />
+      <img src="{{url_for('static', filename='images/FB_Login_Button.jpg')}}" />
     </div>
   </div>
 </body>
