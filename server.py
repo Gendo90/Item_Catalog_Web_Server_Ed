@@ -29,6 +29,10 @@ def listGenre(genre_id):
 
     return render_template('genre_list.html', genre=genre, bookList=genreBooks)
 
+# Book Viewer page for the website
+@app.route('/fiction/<int:genre_id>/<int:book_id>/view')
+def viewPage(genre_id, book_id):
+    return render_template('book-viewer.html')
 
 if __name__ == '__main__':
     app.debug = True
