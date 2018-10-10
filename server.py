@@ -32,7 +32,11 @@ def listGenre(genre_id):
 # Book Viewer page for the website
 @app.route('/fiction/<int:genre_id>/<int:book_id>/view')
 def viewPage(genre_id, book_id):
-    return render_template('book-viewer.html')
+    try:
+        book = session.query(BookItem).filter_by(id = book_id).one()
+        return render_template('book-viewer.html', book = book)
+    except:
+        return "Could not find that genre id and/or book id. Sorry!"
 
 if __name__ == '__main__':
     app.debug = True

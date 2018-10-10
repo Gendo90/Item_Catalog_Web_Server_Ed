@@ -54,18 +54,17 @@
     </div>
 
     <div class=main_content>
-      <h3 class=book_title>BOOK TITLE</h3>
-      <div class=container>
+      <h3 class=book_title>{{book.title}}</h3>
+      <div class=book_view_container>
 
 
-      <div class=book_img>
-        Book Image goes here!
-        From image search online using google.
-      </div>
-      <div class=book_info>
-        Author: from database item
-        <p>Description: from database item</p>
-      </div>
+        <div class=book_img_holder>
+          <img class=book_img src="https://images-na.ssl-images-amazon.com/images/I/51HLw7sxnpL._SX302_BO1,204,203,200_.jpg" />
+        </div>
+        <div class=book_info>
+          Author: {{book.author}}
+          <p>Description: {{book.description}}</p>
+        </div>
 
       </div>
       <br />
