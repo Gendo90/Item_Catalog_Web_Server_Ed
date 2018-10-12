@@ -11,10 +11,11 @@ session = DBSession()
 Genre_I = Genre(name="Fantasy")
 session.add(Genre_I)
 
-Genre_II = Genre(name="Science_Fiction")
+Genre_II = Genre(name="Science Fiction")
 session.add(Genre_II)
 
-
+Genre_III = Genre(name="Self-Help")
+session.add(Genre_III)
 
 #Add one book per genre to start!
 Book_I = BookItem(title="The Hobbit", author="J.R.R. Tolkien",
@@ -32,6 +33,14 @@ past connection to Hyperion, and is structured in the same way as the \
 Canterbury Tales - stories told on-route to their destination!",
 genre=Genre_II)
 session.add(Book_II)
+
+Book_III = BookItem(title="Willpower: Rediscovering the Greatest Human Strength",
+ author=["Roy F. Baumeister", "John Tierney"], description="A book written by \
+ a psychologist and a journalist examining the modern history and study of \
+ the trait of 'willpower', and giving advice on how to use and improve it in \
+ your daily life!",
+genre=Genre_III)
+session.add(Book_III)
 
 
 #Commit all changes made to booklist.db!

@@ -1,5 +1,5 @@
 import sys
-from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy import Column, ForeignKey, Integer, String, PickleType
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
@@ -25,7 +25,7 @@ class BookItem(Base):
 
     title = Column(String(100), nullable = False)
 
-    author = Column(String(100), nullable = False)
+    author = Column(PickleType(), nullable=False)#String(100), nullable = False)
 
     description = Column(String(600))
 

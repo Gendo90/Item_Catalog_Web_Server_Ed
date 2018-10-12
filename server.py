@@ -27,16 +27,32 @@ def listGenre(genre_id):
     genre = session.query(Genre).filter_by(id = genre_id).one()
     genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
 
-    return render_template('genre_list.html', genre=genre, bookList=genreBooks)
+    return render_template('genre_list.html', genre=genre, bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
 
 # Book Viewer page for the website
 @app.route('/fiction/<int:genre_id>/<int:book_id>/view')
 def viewPage(genre_id, book_id):
     try:
         book = session.query(BookItem).filter_by(id = book_id).one()
-        return render_template('book-viewer.html', book = book)
+        if len(book.author)==1:
+            return render_template('book-viewer.html', book = book, author=author)
+        else:
+            authors = ""
+            for author in book.author:
+                authors += author + ", "
+            authors = authors[:len(authors)-2]
+            return render_template('book-viewer.html', book = book, author = authors)
+
     except:
-        return "Could not find that genre id and/or book id. Sorry!"
+        genres = session.query(Genre).all()
+        outputI = "Genre IDs:"
+        for i in genres:
+            outputI += " " + str(i.id) + "    "
+        books = session.query(BookItem).all()
+        outputII = "Book IDs:"
+        for n in books:
+            outputII += " " + str(n.id) + "    "
+        return outputI + outputII
 
 if __name__ == '__main__':
     app.debug = True
