@@ -17,6 +17,10 @@ session.add(Genre_II)
 Genre_III = Genre(name="Self-Help")
 session.add(Genre_III)
 
+Genre_IV = Genre(name="Law")
+session.add(Genre_IV)
+
+
 #Add one book per genre to start!
 Book_I = BookItem(title="The Hobbit", author="J.R.R. Tolkien",
 description="A classic fantasy adventure masterpiece, which introduces \
@@ -41,6 +45,14 @@ Book_III = BookItem(title="Willpower: Rediscovering the Greatest Human Strength"
  your daily life!",
 genre=Genre_III)
 session.add(Book_III)
+
+Book_IV = BookItem(title="Law for Dummies",
+ author=["John Ventura"], description="""A book written by
+ a lawyer that explains the basics of different areas of the law, especially
+ common occurences and legal tips that are directly applicable to the reader's
+ life, like contracts and family law.""",
+genre=Genre_IV)
+session.add(Book_IV)
 
 
 #Commit all changes made to booklist.db!
