@@ -40,7 +40,7 @@ def viewPage(genre_id, book_id):
         title = urllib.parse.quote(book.title)
         #image search api uri: "https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
         if len(book.author)==1:
-            return render_template('book-viewer.html', book = book, parse_title = title, author=author)
+            return render_template('book-viewer.html', book = book, parse_title = title, author=book.author[0])
         else:
             authors = ""
             for author in book.author:
