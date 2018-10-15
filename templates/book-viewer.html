@@ -85,7 +85,7 @@
 </body>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
-    $.getJSON("https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM", function(data) {
+    $.getJSON("https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&exactTerms={{parse_title}}&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM", function(data) {
 
         var url = `${data.items[0].link}`
 
