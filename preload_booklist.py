@@ -22,13 +22,13 @@ session.add(Genre_IV)
 
 
 #Add one book per genre to start!
-Book_I = BookItem(title="The Hobbit", author="J.R.R. Tolkien",
+Book_I = BookItem(title="The Hobbit", author=["J.R.R. Tolkien"],
 description="A classic fantasy adventure masterpiece, which introduces \
 Middle-Earth to most readers, and serves as a prequel to Tolkien's Lord of the \
 Rings epic saga.", genre=Genre_I)
 session.add(Book_I)
 
-Book_II = BookItem(title="Hyperion", author="Dan Simmons",
+Book_II = BookItem(title="Hyperion", author=["Dan Simmons"],
 description="A Hugo Award-winning science fiction novel, which details the \
 journey of a special force of 'pilgrims' to the planet Hyperion, who were \
 all connected to the planet in the past and are now tasked with unravelling \

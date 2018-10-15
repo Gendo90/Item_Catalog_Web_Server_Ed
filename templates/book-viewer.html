@@ -59,7 +59,7 @@
 
 
         <div class=book_img_holder>
-          <img class=book_img src="https://images-na.ssl-images-amazon.com/images/I/51HLw7sxnpL._SX302_BO1,204,203,200_.jpg" />
+          <img class=book_img src = 'https://image.shutterstock.com/image-vector/emoticon-icon-emoji-isolated-on-260nw-606532121.jpg'/>
         </div>
         <div class=book_info>
           Author: {{author}}
@@ -83,4 +83,14 @@
 
 
 </body>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script>
+    $.getJSON("https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM", function(data) {
+
+        var url = `${data.items[0].link}`
+
+
+        $(".book_img").attr('src', url);
+    });
+    </script>
 </html>
