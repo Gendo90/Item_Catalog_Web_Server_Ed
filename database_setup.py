@@ -8,6 +8,15 @@ Base = declarative_base()
 
 #write code here!
 
+class SuperCategory(Base):
+    __tablename__ = 'super_category'
+
+    name = Column(
+    String(25), nullable = False)
+
+    id = Column(
+    Integer, primary_key = True)
+
 class Genre(Base):
     __tablename__ = 'genre'
 
@@ -16,6 +25,11 @@ class Genre(Base):
 
     id = Column(
     Integer, primary_key = True)
+
+    super_category_id = Column(
+    Integer, ForeignKey('super_category.id'), nullable = False)
+
+    super_category = relationship(SuperCategory)
 
 
 class BookItem(Base):

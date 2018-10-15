@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Genre, BookItem
+from database_setup import Base, SuperCategory, Genre, BookItem
 
 engine = create_engine('sqlite:///booklist.db')
 Base.metadata.bind = engine
@@ -23,6 +23,15 @@ def mainPage():
 @app.route('/login/')
 def loginPage():
     return render_template('login.html')
+
+# First of three super-categories that link to different pages - refactor
+# later to make the three super-categories part of a table in the database
+@app.route("/<string:super_category_name>/")
+def superCategoryMainPage(super_category_name):
+    thisCategory = session.query(SuperCategory).filter_by(name=super_category_name).one()
+    containedGenres = session.query(Genre).filter_by(super_category_id=thisCategory.id).all()
+
+    return render_template('genreIndex.html', superCategory=thisCategory.name, genres=containedGenres)
 
 # code from project.py listing books by genre
 @app.route("/genres/<int:genre_id>/")

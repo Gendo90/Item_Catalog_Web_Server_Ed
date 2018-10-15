@@ -1,23 +1,34 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Genre, BookItem
+from database_setup import Base, SuperCategory, Genre, BookItem
 
 engine = create_engine('sqlite:///booklist.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 session = DBSession()
 
+# add super-categories that contain the genres
+SuperCategory_I = SuperCategory(name="Fiction")
+session.add(SuperCategory_I)
+
+SuperCategory_II = SuperCategory(name="Non-Fiction")
+session.add(SuperCategory_II)
+
+SuperCategory_III = SuperCategory(name="Reference")
+session.add(SuperCategory_III)
+
+
 #Add basic genres
-Genre_I = Genre(name="Fantasy")
+Genre_I = Genre(name="Fantasy", super_category=SuperCategory_I)
 session.add(Genre_I)
 
-Genre_II = Genre(name="Science Fiction")
+Genre_II = Genre(name="Science Fiction", super_category=SuperCategory_I)
 session.add(Genre_II)
 
-Genre_III = Genre(name="Self-Help")
+Genre_III = Genre(name="Self-Help", super_category=SuperCategory_II)
 session.add(Genre_III)
 
-Genre_IV = Genre(name="Law")
+Genre_IV = Genre(name="Law", super_category=SuperCategory_II)
 session.add(Genre_IV)
 
 
