@@ -39,23 +39,25 @@ def listGenre(genre_id):
     genre = session.query(Genre).filter_by(id = genre_id).one()
     genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
 
-    return render_template('genre_list.html', genre=genre, bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
+    return render_template('genre-list.html', genre=genre, bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
 
 # Book Viewer page for the website
 @app.route('/fiction/<int:genre_id>/<int:book_id>/view')    #api key: AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM
 def viewPage(genre_id, book_id):
+    genre = session.query(Genre).filter_by(id = genre_id).one()
+    genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
     try:
         book = session.query(BookItem).filter_by(id = book_id).one()
         title = urllib.parse.quote(book.title)
         #image search api uri: "https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
         if len(book.author)==1:
-            return render_template('book-viewer.html', book = book, parse_title = title, author=book.author[0])
+            return render_template('book-viewer.html', genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author=book.author[0])
         else:
             authors = ""
             for author in book.author:
                 authors += author + ", "
             authors = authors[:len(authors)-2]
-            return render_template('book-viewer.html', book = book, parse_title = title, author = authors)
+            return render_template('book-viewer.html', genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author = authors)
 
     except:
         genres = session.query(Genre).all()

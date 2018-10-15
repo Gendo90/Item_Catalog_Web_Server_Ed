@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tells the browser what the title of this page should be. -->
+  <title>Best Books Catalog</title>
+  <meta name="description" content="A website listing books that users
+  recommend based on their own reading experiences, and why they recommend
+  these books, categorized by genre.">
+  <meta name="website author" content="Patrick Gendotti">
+
+  <!-- Load the page styles. -->
+  <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet" type='text/css'>
+</head>
+<body>
+  <div class=heading>
+    <h1>Best Books!</h1>
+    <p>A place to review great reads, as suggested by users like you!</p>
+  </div>
+
+
+
+  <div class=main_container>
+    <div class=sidebar>
+      <h2>{{genre.name}}</h2>
+      <div class=sidebar_line></div>
+                                      {% for book in bookList %}
+        <h3 class=sidebar_links>
+          <a href={{url_for('viewPage', genre_id=book.genre_id, book_id=book.id)}}>{{book.title}}</a></h3>
+                                      {% endfor %}
+
+      <!--<h5>Science Fiction</h5>
+        <h5>Fantasy</h5>
+      <h3 class=sidebar_links><a href=index.html>Non-Fiction</a></h3>
+        <h5>Cooking</h5>
+        <h5>History</h5>
+        <h5>Health</h5>
+        <h5>Philosophy</h5>
+      <h3 class=sidebar_links><a href=index.html>Reference</a></h3>
+        <h5>Dictionary</h5>
+        <h5>Encyclopedia</h5>-->
+    </div>
+
+    <div class=main_content>
+    </div>
+  </div>
+
+  <div class=container>
+    <div>FOOTER GOES HERE</div>
+  </div>
+
+
+</body>
+</html>
