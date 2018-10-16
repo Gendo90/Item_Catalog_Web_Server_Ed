@@ -158,6 +158,7 @@ h3.sidebar_links {
 }
 
 .book_info {
+  position: relative;
   margin-left: 10px;
   margin-right: 15px;
   min-width: 140px;
@@ -165,6 +166,16 @@ h3.sidebar_links {
   max-width: 315px;
   background-color: #718eb1;
   color: #b8cf69;
+}
+
+.modify_book {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+.delete {
+  width: auto;
 }
 
 @media only screen and (min-width: 800px) {
