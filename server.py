@@ -70,6 +70,14 @@ def viewPage(genre_id, book_id):
             outputII += " " + str(n.id) + "    "
         return outputI + outputII
 
+# Main page for the website
+@app.route('/fiction/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
+def deleteBook(genre_id, book_id):
+    thisBook = session.query(BookItem).filter_by(id = book_id).one()
+    session.delete(thisBook)
+    session.commit()
+    return render_template('index-logged-in.html')
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5500)
