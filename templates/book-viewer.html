@@ -67,7 +67,7 @@
         <div class=book_info>
           Author: {{author}}
           <p>Description: {{book.description}}</p>
-          <div class=modify_book><button type=button>Edit</button><button class=delete type=button>Delete</button></div>
+          <div class=modify_book><button type=button>Edit</button><button class="delete" type=button>Delete</button></div>
         </div>
 
       </div>
@@ -96,5 +96,15 @@
 
         $(".book_img").attr('src', url);
     });
-    </script>
+</script>
+<script>
+  var delete_response;
+  $(".delete").on("click", function check_delete(){
+    delete_response = confirm("Are you sure you want to delete this book?");
+    if (delete_response === true) {
+      window.location.replace('/genres/{{genre.id}}');
+    };
+  });
+
+</script>
 </html>
