@@ -66,8 +66,12 @@
         </div>
         <div class=book_info>
           Author: {{author}}
-          <p>Description: {{book.description}}</p>
-          <div class=modify_book><button type=button>Edit</button><button class="delete" type=button>Delete</button></div>
+          <p id="current_description">Description: {{book.description}}</p>
+          <form action="./edit" method="POST" id="edit_desc_form">
+            <textarea rows=8 form="edit_desc_form">{{book.description}}</textarea>
+            <input type="submit"/>
+          </form>
+          <div class=modify_book><button class="edit" type=button>Edit</button><button class="delete" type=button>Delete</button></div>
         </div>
 
       </div>
@@ -89,6 +93,11 @@
 </body>
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script>
+  $("#edit_desc_form").load(function(){
+    $("#edit_desc_form").hide();
+  }());
+</script>
+<script>
     $.getJSON("https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&exactTerms={{parse_title}}&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM", function(data) {
 
         var url = `${data.items[0].link}`
@@ -107,6 +116,14 @@
         window.location.replace('/genres/{{genre.id}}');
       }, 1000);
     };
+  });
+
+</script>
+<script>
+  $(".edit").on("click", function(){
+    $("#current_description").hide();
+    $("#edit_desc_form").show();
+    $("textarea").autoResize();
   });
 
 </script>

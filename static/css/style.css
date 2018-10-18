@@ -168,6 +168,11 @@ h3.sidebar_links {
   color: #b8cf69;
 }
 
+textarea {
+  width: inherit;
+  resize: none;
+}
+
 .modify_book {
   position: absolute;
   bottom: 5px;
