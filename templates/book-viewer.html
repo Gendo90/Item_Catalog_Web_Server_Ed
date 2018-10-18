@@ -66,10 +66,11 @@
         </div>
         <div class=book_info>
           Author: {{author}}
-          <p id="current_description">Description: {{book.description}}</p>
+          <p class="description" id="current_description">Description: {{book.description}}</p>
           <form action="./edit" method="POST" id="edit_desc_form">
+            <p>Description:</p>
             <textarea rows=8 form="edit_desc_form">{{book.description}}</textarea>
-            <input type="submit"/>
+            <input class="submit_description" type="submit"/>
           </form>
           <div class=modify_book><button class="edit" type=button>Edit</button><button class="delete" type=button>Delete</button></div>
         </div>
@@ -122,6 +123,8 @@
 <script>
   $(".edit").on("click", function(){
     $("#current_description").hide();
+    $(".edit").hide();
+    $(".delete").hide();
     $("#edit_desc_form").show();
     $("textarea").autoResize();
   });

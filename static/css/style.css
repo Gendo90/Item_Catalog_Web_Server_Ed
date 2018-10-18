@@ -23,7 +23,7 @@ a:hover {
   color: lightgray;
 }
 
-button {
+button, .submit_description {
   background-color: lightgray;
   color: black;
   width: 48px;
@@ -182,6 +182,18 @@ textarea {
 .delete {
   width: auto;
 }
+
+.description {
+  margin-bottom: 58px;
+}
+
+.submit_description {
+  width: auto;
+  margin-left: 5px;
+  vertical-align: calc((48px / 2) - 5px);
+}
+
+
 
 @media only screen and (min-width: 800px) {
   .main_content {
