@@ -179,7 +179,7 @@ textarea {
   right: 5px;
 }
 
-.delete {
+.delete, .new_book {
   width: auto;
 }
 
