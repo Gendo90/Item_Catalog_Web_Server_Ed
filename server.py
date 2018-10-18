@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, redirect
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -70,13 +70,21 @@ def viewPage(genre_id, book_id):
             outputII += " " + str(n.id) + "    "
         return outputI + outputII
 
-# Main page for the website
+# inaccessible webpage (uses POST method only) that deletes a book from a genre
 @app.route('/fiction/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
 def deleteBook(genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     session.delete(thisBook)
     session.commit()
     return render_template('index-logged-in.html')
+
+# inaccessible webpage (uses POST method only) that edits a book's description
+@app.route('/fiction/<int:genre_id>/<int:book_id>/edit', methods=['POST'])
+def editBook(genre_id, book_id):
+    thisBook = session.query(BookItem).filter_by(id = book_id).one()
+    thisBook.description = request.form['updated_description']
+    session.commit()
+    return redirect(url_for('viewPage', genre_id=genre_id, book_id=book_id))
 
 if __name__ == '__main__':
     app.debug = True
