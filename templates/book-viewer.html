@@ -43,7 +43,7 @@
       <div class=add_book><a href='{{url_for('addBook')}}'><button class="new_book" type=button>Add Another Book!</button></a></div>
                                       {% for item in genreBooks %}
         <h3 class=sidebar_links>
-          <a href={{url_for('viewPage', genre_id=item.genre_id, book_id=book.id)}}>{{item.title}}</a></h3>
+          <a href={{url_for('viewPage', genre_id=item.genre_id, book_id=item.id)}}>{{item.title}}</a></h3>
                                       {% endfor %}
       <!--<h5>Science Fiction</h5>
         <h5>Fantasy</h5>
