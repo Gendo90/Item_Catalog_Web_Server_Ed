@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tells the browser what the title of this page should be. -->
+  <title>Best Books Catalog</title>
+  <meta name="description" content="A website listing books that users
+  recommend based on their own reading experiences, and why they recommend
+  these books, categorized by genre.">
+  <meta name="website author" content="Patrick Gendotti">
+
+  <!-- Load the page styles. -->
+  <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet">
+</head>
+<body>
+  <div class=container>
+    <div class=loggedinheading>
+      <!--GHOST DIV FOR SPACING SO HEADER IS CENTERED!-->
+      <p class=text_blend> Login </p>
+    </div>
+
+    <div class=origheading>
+      <div>
+        <h1>Best Books!</h1>
+        <p>A place to review great reads, as suggested by users like you!</p>
+      </div>
+    </div>
+
+    <div class=loggedinheading>
+      <a href="{{url_for('loginPage')}}"><button class=header_btn type=button>Login</button></a>
+    </div>
+  </div>
+
+
+
+  <div class=main_container>
+    <div class=sidebar>
+      <h2>Genres</h2>
+      <div class=sidebar_line></div>
+      <h3 class=sidebar_links><a href="{{url_for('superCategoryMainPage', super_category_name='Fiction')}}">Fiction</a></h3>
+      <!--<h5>Science Fiction</h5>
+      <h5>Fantasy</h5>-->
+      <h3 class=sidebar_links><a href=/Non-Fiction>Non-Fiction</a></h3>
+      <!--<h5>Cooking</h5>
+      <h5>History</h5>
+      <h5>Health</h5>
+      <h5>Philosophy</h5>-->
+      <h3 class=sidebar_links><a href=/Reference>Reference</a></h3>
+      <!--<h5>Dictionary</h5>
+      <h5>Encyclopedia</h5>-->
+    </div>
+
+    <div class=main_content>
+      <div class=new_book_info>
+        <form method="POST" action="{{url_for('addBook')}}">
+          <p>Book Title:</p>
+          <input name='title' type=text placeholder='Title'/>
+          <p>Book Author:</p>
+          <input name='author' type=text placeholder='Author'/>
+          <p>Book Description:</p>
+          <textarea rows=8 name='description' placeholder="Enter description here"/></textarea>
+          <input class=submit_book type=submit text='Submit' />
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class=container>
+    <div>FOOTER GOES HERE</div>
+  </div>
+
+
+
+</body>
+</html>

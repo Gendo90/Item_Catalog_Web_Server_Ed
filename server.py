@@ -86,6 +86,14 @@ def editBook(genre_id, book_id):
     session.commit()
     return redirect(url_for('viewPage', genre_id=genre_id, book_id=book_id))
 
+# inaccessible webpage (uses POST method only) that creates a new book
+@app.route('/newbook', methods=['GET', 'POST'])
+def addBook():
+    if(request.method=='POST'):
+        return redirect(url_for('viewPage', genre_id=1, book_id=1))
+    else:
+        return render_template('new-book.html')
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5500)

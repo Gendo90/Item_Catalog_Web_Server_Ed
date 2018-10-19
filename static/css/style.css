@@ -23,7 +23,7 @@ a:hover {
   color: lightgray;
 }
 
-button, .submit_description {
+button, .submit_description, .submit_book {
   background-color: lightgray;
   color: black;
   width: 48px;
@@ -157,7 +157,7 @@ h3.sidebar_links {
   object-fit: contain;
 }
 
-.book_info {
+.book_info, .new_book_info {
   position: relative;
   margin-left: 10px;
   margin-right: 15px;
@@ -166,6 +166,10 @@ h3.sidebar_links {
   max-width: 315px;
   background-color: #718eb1;
   color: #b8cf69;
+}
+
+.new_book_info {
+  padding-left: 10px;
 }
 
 textarea {
@@ -187,7 +191,7 @@ textarea {
   margin-bottom: 58px;
 }
 
-.submit_description {
+.submit_description, .submit_book {
   width: auto;
   margin-left: 5px;
   vertical-align: calc((48px / 2) - 5px);
