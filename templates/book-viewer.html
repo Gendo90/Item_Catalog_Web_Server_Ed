@@ -63,7 +63,11 @@
 
 
         <div class=book_img_holder>
-          <img class=book_img src = "{{url_for('static', filename='images/Loading_icon.gif')}}"/>
+          {% if book.imgURL %}
+          <img class=book_img src ="{{book.imgURL}}"/>
+          {% else %}
+          <img class=book_img id=loading_img src = "{{url_for('static', filename='images/Loading_icon.gif')}}"/>
+          {% endif %}
         </div>
         <div class=book_info>
           Author: {{author}}
@@ -105,7 +109,7 @@
         var url = `${data.items[0].link}`
 
 
-        $(".book_img").attr('src', url);
+        $("#loading_img").attr('src', url);
     });
 </script>
 <script>

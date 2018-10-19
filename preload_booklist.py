@@ -17,6 +17,7 @@ session.add(SuperCategory_II)
 SuperCategory_III = SuperCategory(name="Reference")
 session.add(SuperCategory_III)
 
+session.commit()
 
 #Add basic genres
 Genre_I = Genre(name="Fantasy", super_category=SuperCategory_I)
@@ -36,7 +37,7 @@ session.add(Genre_IV)
 Book_I = BookItem(title="The Hobbit", author=["J.R.R. Tolkien"],
 description="A classic fantasy adventure masterpiece, which introduces \
 Middle-Earth to most readers, and serves as a prequel to Tolkien's Lord of the \
-Rings epic saga.", genre=Genre_I)
+Rings epic saga.", genre=Genre_I, imgURL='https://i.pinimg.com/236x/46/20/86/46208668db6465c78d5cdb774dfa0e69--hobbit-book-the-hobbit.jpg')
 session.add(Book_I)
 
 Book_II = BookItem(title="Hyperion", author=["Dan Simmons"],
@@ -46,7 +47,7 @@ all connected to the planet in the past and are now tasked with unravelling \
 its secrets. Story is comprised of multiple narrative accounts of the 'pilgrims'\
 past connection to Hyperion, and is structured in the same way as the \
 Canterbury Tales - stories told on-route to their destination!",
-genre=Genre_II)
+genre=Genre_II, imgURL=None)
 session.add(Book_II)
 
 Book_III = BookItem(title="Willpower: Rediscovering the Greatest Human Strength",
@@ -54,7 +55,7 @@ Book_III = BookItem(title="Willpower: Rediscovering the Greatest Human Strength"
  a psychologist and a journalist examining the modern history and study of \
  the trait of 'willpower', and giving advice on how to use and improve it in \
  your daily life!",
-genre=Genre_III)
+genre=Genre_III, imgURL=None)
 session.add(Book_III)
 
 Book_IV = BookItem(title="Law for Dummies",
@@ -62,7 +63,7 @@ Book_IV = BookItem(title="Law for Dummies",
  a lawyer that explains the basics of different areas of the law, especially
  common occurences and legal tips that are directly applicable to the reader's
  life, like contracts and family law.""",
-genre=Genre_IV)
+genre=Genre_IV, imgURL=None)
 session.add(Book_IV)
 
 
