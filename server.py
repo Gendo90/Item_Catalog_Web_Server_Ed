@@ -90,7 +90,22 @@ def editBook(genre_id, book_id):
 @app.route('/newbook', methods=['GET', 'POST'])
 def addBook():
     if(request.method=='POST'):
-        return redirect(url_for('viewPage', genre_id=1, book_id=1))
+        title = request.form['title']
+        author = request.form['author']
+        desc = request.form['description']
+        genre = request.form['genre']
+        try:
+            thisGenre=session.query(Genre).filter_by(name=genre).one()
+            newBook = BookItem(title=title, author=[author],
+            description=desc,
+            genre=thisGenre, imgURL=None)
+            session.add(newBook)
+            session.commit()
+            thisBook = session.query(BookItem).filter_by(title=title).one()
+            return redirect(url_for('viewPage', genre_id=thisBook.genre_id,
+            book_id=thisBook.id))
+        except:
+            pass
     else:
         return render_template('new-book.html')
 
