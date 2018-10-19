@@ -43,6 +43,8 @@ class BookItem(Base):
 
     description = Column(String(600))
 
+    imgURL = Column(String(100))
+
     genre_id = Column(Integer, ForeignKey('genre.id'), nullable = False)
 
     genre = relationship(Genre)
