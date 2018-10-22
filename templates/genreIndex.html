@@ -28,8 +28,11 @@
       <h2>{{superCategory}}</h2>
       <div class=sidebar_line></div>
                                       {% for genre in genres %}
-        <h3 class=sidebar_links>
+        <div class=sidebar_links>
+          <h3>
           <a href={{url_for('listGenre', genre_id=genre.id)}}>{{genre.name}}</a></h3>
+          <br />
+        </div>
                                       {% endfor %}
 
       <!--<h5>Science Fiction</h5>

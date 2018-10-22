@@ -10,7 +10,7 @@ h2 {
 
 h3 {
   width: 120px;
-  height: 48px;
+  margin: auto;
 }
 
 a {
@@ -92,7 +92,9 @@ button, .submit_description, .submit_book {
   margin-bottom: 10px;
 }
 
-h3.sidebar_links {
+div.sidebar_links {
+  min-height: 48px;
+  text-align: center;
   margin: auto;
 }
 
