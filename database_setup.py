@@ -49,6 +49,20 @@ class BookItem(Base):
 
     genre = relationship(Genre)
 
+    # We added this serialize function to be able to send JSON objects in a
+    # serializable format
+    @property
+    def serialize(self):
+
+        return {
+            'title': self.title,
+            'author': self.author,
+            'description': self.description,
+            'image_URL': self.imgURL,
+            'id': self.id,
+            'genre': self.genre.name
+        }
+
 
 
 #end of code!

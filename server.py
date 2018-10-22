@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect
+from flask import Flask, render_template, url_for, request, redirect, jsonify
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -118,6 +118,17 @@ def setCoverImg(genre_id, book_id, imgLocation):
     thisBook.imgURL = str(imgLocation)
     session.commit()
     return redirect(url_for('viewPage', genre_id=genre_id, book_id=book_id))
+
+# used to get the JSON info for a particular book
+@app.route('/fiction/<int:genre_id>/<int:book_id>/JSON', methods=['GET'])
+def singleBookJSON(genre_id, book_id):
+    try:
+        book = session.query(BookItem).filter(
+            BookItem.genre_id == genre_id, BookItem.id==book_id).one()
+        genre = session.query(Genre).filter_by(id=genre_id).one()
+        return jsonify(BookItems=[book.serialize])
+    except:
+        return "That genre id and/or book id could not be found!"
 
 if __name__ == '__main__':
     app.debug = True
