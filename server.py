@@ -109,6 +109,15 @@ def addBook():
     else:
         return render_template('new-book.html')
 
+# inaccessible webpage (uses POST method only) that sets the imgURL property
+# for a book
+@app.route('/fiction/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
+def setCoverImg(genre_id, book_id, imgLocation):
+    thisBook = session.query(BookItem).filter_by(id = book_id).one()
+    thisBook.imgURL = str(imgLocation)
+    session.commit()
+    return redirect(url_for('viewPage', genre_id=genre_id, book_id=book_id))
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5500)

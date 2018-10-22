@@ -111,6 +111,8 @@
         var url = `${data.items[0].link}`
         console.log(url)
 
+        $.post('./cover_pic/' + url)
+
         $("#loading_img").attr('src', url);
     });
   }});
