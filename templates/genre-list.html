@@ -29,7 +29,7 @@
       <div class=sidebar_line></div>
                                       {% for book in bookList %}
         <h3 class=sidebar_links>
-          <a href={{url_for('viewPage', genre_id=book.genre_id, book_id=book.id)}}>{{book.title}}</a></h3>
+          <a href={{url_for('viewPage', super_category_name=super_category_name, genre_id=book.genre_id, book_id=book.id)}}>{{book.title}}</a></h3>
                                       {% endfor %}
 
       <!--<h5>Science Fiction</h5>

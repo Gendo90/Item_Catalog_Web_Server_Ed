@@ -34,16 +34,16 @@ def superCategoryMainPage(super_category_name):
     return render_template('genreIndex.html', superCategory=thisCategory.name, genres=containedGenres)
 
 # code from project.py listing books by genre
-@app.route("/genres/<int:genre_id>/")
-def listGenre(genre_id):
+@app.route("/<string:super_category_name>/<int:genre_id>/")
+def listGenre(super_category_name, genre_id):
     genre = session.query(Genre).filter_by(id = genre_id).one()
     genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
 
-    return render_template('genre-list.html', genre=genre, bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
+    return render_template('genre-list.html', super_category_name=super_category_name, genre=genre, bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
 
 # Book Viewer page for the website
-@app.route('/fiction/<int:genre_id>/<int:book_id>/view')    #api key: AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM
-def viewPage(genre_id, book_id):
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/view')    #api key: AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM
+def viewPage(super_category_name, genre_id, book_id):
     genre = session.query(Genre).filter_by(id = genre_id).one()
     genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
     try:
@@ -51,13 +51,13 @@ def viewPage(genre_id, book_id):
         title = urllib.parse.quote(book.title)
         #image search api uri: "https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
         if len(book.author)==1:
-            return render_template('book-viewer.html', genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author=book.author[0])
+            return render_template('book-viewer.html', super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author=book.author[0])
         else:
             authors = ""
             for author in book.author:
                 authors += author + ", "
             authors = authors[:len(authors)-2]
-            return render_template('book-viewer.html', genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author = authors)
+            return render_template('book-viewer.html', super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author = authors)
 
     except:
         genres = session.query(Genre).all()
@@ -71,20 +71,20 @@ def viewPage(genre_id, book_id):
         return outputI + outputII
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
-@app.route('/fiction/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
-def deleteBook(genre_id, book_id):
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
+def deleteBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     session.delete(thisBook)
     session.commit()
     return render_template('index-logged-in.html')
 
 # inaccessible webpage (uses POST method only) that edits a book's description
-@app.route('/fiction/<int:genre_id>/<int:book_id>/edit', methods=['POST'])
-def editBook(genre_id, book_id):
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit', methods=['POST'])
+def editBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     thisBook.description = request.form['updated_description']
     session.commit()
-    return redirect(url_for('viewPage', genre_id=genre_id, book_id=book_id))
+    return redirect(url_for('viewPage', super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # inaccessible webpage (uses POST method only) that creates a new book
 @app.route('/newbook', methods=['GET', 'POST'])
@@ -112,16 +112,16 @@ def addBook():
 
 # inaccessible webpage (uses POST method only) that sets the imgURL property
 # for a book
-@app.route('/fiction/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
-def setCoverImg(genre_id, book_id, imgLocation):
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
+def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     thisBook.imgURL = str(imgLocation)
     session.commit()
-    return redirect(url_for('viewPage', genre_id=genre_id, book_id=book_id))
+    return redirect(url_for('viewPage', super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # used to get the JSON info for a particular book
-@app.route('/fiction/<int:genre_id>/<int:book_id>/JSON', methods=['GET'])
-def singleBookJSON(genre_id, book_id):
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/JSON', methods=['GET'])
+def singleBookJSON(super_category_name, genre_id, book_id):
     try:
         book = session.query(BookItem).filter(
             BookItem.genre_id == genre_id, BookItem.id==book_id).one()
@@ -131,8 +131,8 @@ def singleBookJSON(genre_id, book_id):
         return "That genre id and/or book id could not be found!"
 
 # used to get the JSON info for an entire genre
-@app.route('/fiction/<int:genre_id>/JSON', methods=['GET'])
-def genreBooksJSON(genre_id):
+@app.route('/<string:super_category_name>/<int:genre_id>/JSON', methods=['GET'])
+def genreBooksJSON(super_category_name, genre_id):
     genre = session.query(Genre).filter_by(id=genre_id).one()
     items = session.query(BookItem).filter_by(
         genre_id=genre_id).all()
