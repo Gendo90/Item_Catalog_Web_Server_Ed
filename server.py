@@ -120,7 +120,7 @@ def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     return redirect(url_for('viewPage', super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # used to get the JSON info for a particular book
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/JSON', methods=['GET'])
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/JSON')
 def singleBookJSON(super_category_name, genre_id, book_id):
     try:
         book = session.query(BookItem).filter(
@@ -131,12 +131,19 @@ def singleBookJSON(super_category_name, genre_id, book_id):
         return "That genre id and/or book id could not be found!"
 
 # used to get the JSON info for an entire genre
-@app.route('/<string:super_category_name>/<int:genre_id>/JSON', methods=['GET'])
+@app.route('/<string:super_category_name>/<int:genre_id>/JSON')
 def genreBooksJSON(super_category_name, genre_id):
     genre = session.query(Genre).filter_by(id=genre_id).one()
     items = session.query(BookItem).filter_by(
         genre_id=genre_id).all()
     return jsonify(BookItems=[i.serialize for i in items])
+
+# used to get the JSON info for an entire supercategory
+@app.route('/<string:super_category_name>/JSON/')
+def superCategoryJSON(super_category_name):
+    super_category = session.query(SuperCategory).filter_by(name=super_category_name).one()
+    genresInCategory = session.query(Genre).filter_by(super_category_id=super_category.id).all()
+    return jsonify(Genre=[i.serialize for i in genresInCategory])
 
 if __name__ == '__main__':
     app.debug = True

@@ -31,6 +31,17 @@ class Genre(Base):
 
     super_category = relationship(SuperCategory)
 
+    # We added this serialize function to be able to send JSON objects in a
+    # serializable format
+    @property
+    def serialize(self):
+
+        return {
+            'name': self.name,
+            'id': self.id,
+            'super_category': self.super_category.name
+        }
+
 
 class BookItem(Base):
     __tablename__ = 'book_item'
