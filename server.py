@@ -130,6 +130,14 @@ def singleBookJSON(genre_id, book_id):
     except:
         return "That genre id and/or book id could not be found!"
 
+# used to get the JSON info for an entire genre
+@app.route('/fiction/<int:genre_id>/JSON', methods=['GET'])
+def genreBooksJSON(genre_id):
+    genre = session.query(Genre).filter_by(id=genre_id).one()
+    items = session.query(BookItem).filter_by(
+        genre_id=genre_id).all()
+    return jsonify(BookItems=[i.serialize for i in items])
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0', port=5500)
