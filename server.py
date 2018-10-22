@@ -107,7 +107,8 @@ def addBook():
         except:
             pass
     else:
-        return render_template('new-book.html')
+        allGenres = session.query(Genre).all()
+        return render_template('new-book.html', allGenres=allGenres)
 
 # inaccessible webpage (uses POST method only) that sets the imgURL property
 # for a book

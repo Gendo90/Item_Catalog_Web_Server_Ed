@@ -61,7 +61,12 @@
           <p>Book Author:</p>
           <input name='author' type=text placeholder='Author'/>
           <p>Genre:</p>
-          <input name='genre' type=text/>
+          <input name='genre' list='all_genres'/>
+            <datalist id='all_genres'>
+                    {% for item in allGenres %}
+              <option value="{{item.name}}"></option>
+                    {% endfor %}
+            </datalist>
           <p>Book Description:</p>
           <textarea rows=8 name='description' placeholder="Enter description here"/></textarea>
           <input class=submit_book type=submit text='Submit' />
