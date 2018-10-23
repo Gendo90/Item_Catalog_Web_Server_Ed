@@ -5,6 +5,10 @@ from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, SuperCategory, Genre, BookItem
 
+# import packages for anti-forgery state token creation
+from flask import session as login_session
+import random, string
+
 engine = create_engine('sqlite:///booklist.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
@@ -23,6 +27,16 @@ def mainPage():
 @app.route('/login/')
 def loginPage():
     return render_template('login.html')
+
+# Create a state token to prevent request forgery.
+# Store it in the session for later validation
+# Show login verification page
+@app.route('/login/verify')
+def showLogin():
+    state = ''.join(random.choice(string.ascii_uppercase +
+    string.digits) for x in range(32))
+    login_session['state'] = state
+    return ("The current session state is {}").format(login_session['state'])
 
 # First of three super-categories that link to different pages - refactor
 # later to make the three super-categories part of a table in the database
