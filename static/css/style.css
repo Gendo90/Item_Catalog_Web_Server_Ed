@@ -23,6 +23,15 @@ a:hover {
   color: lightgray;
 }
 
+ul {
+  list-style-type: none;
+}
+
+li {
+  list-style-type: none;
+  background-color: darkred;
+}
+
 button, .submit_description, .submit_book {
   background-color: lightgray;
   color: black;

@@ -1,7 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, jsonify, flash
 app = Flask(__name__)
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, SuperCategory, Genre, BookItem
 
@@ -100,13 +100,18 @@ def addBook():
         genre = request.form['genre']
         try:
             thisGenre=session.query(Genre).filter_by(name=genre).one()
-            newBook = BookItem(title=title, author=[author],
-            description=desc,
-            genre=thisGenre, imgURL=None)
-            session.add(newBook)
-            session.commit()
-            thisBook = session.query(BookItem).filter_by(title=newBook.title).one()
-            flash(thisBook.title + " added!")
+            if(not session.query(exists().where(BookItem.title==title).where(BookItem.genre_id==thisGenre.id)).scalar()):
+                newBook = BookItem(title=title, author=[author],
+                description=desc,
+                genre=thisGenre, imgURL=None)
+                session.add(newBook)
+                session.commit()
+                thisBook = session.query(BookItem).filter_by(title=title).one()
+                print(thisBook.title)
+                flash(thisBook.title + " added!")
+            else:
+                thisBook = session.query(BookItem).filter_by(title=title).one()
+                flash(thisBook.title + " already exists in your collection!")
             return redirect(url_for('viewPage', super_category_name=thisGenre.super_category.name, genre_id=thisBook.genre_id,
             book_id=thisBook.id))
         except:
