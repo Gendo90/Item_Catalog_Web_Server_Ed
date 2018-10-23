@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, redirect, jsonify
+from flask import Flask, render_template, url_for, request, redirect, jsonify, flash
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -74,8 +74,10 @@ def viewPage(super_category_name, genre_id, book_id):
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
 def deleteBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
+    title = thisBook.title
     session.delete(thisBook)
     session.commit()
+    flash(title + " removed!")
     return render_template('index-logged-in.html')
 
 # inaccessible webpage (uses POST method only) that edits a book's description
@@ -83,7 +85,9 @@ def deleteBook(super_category_name, genre_id, book_id):
 def editBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     thisBook.description = request.form['updated_description']
+    title = thisBook.title
     session.commit()
+    flash(title + "'s description edited!")
     return redirect(url_for('viewPage', super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # inaccessible webpage (uses POST method only) that creates a new book
@@ -101,11 +105,13 @@ def addBook():
             genre=thisGenre, imgURL=None)
             session.add(newBook)
             session.commit()
-            thisBook = session.query(BookItem).filter_by(title=title).one()
-            return redirect(url_for('viewPage', genre_id=thisBook.genre_id,
+            thisBook = session.query(BookItem).filter_by(title=newBook.title).one()
+            flash(thisBook.title + " added!")
+            return redirect(url_for('viewPage', super_category_name=thisGenre.super_category.name, genre_id=thisBook.genre_id,
             book_id=thisBook.id))
         except:
-            pass
+            allGenres = session.query(Genre).all()
+            return render_template('new-book.html', allGenres=allGenres)
     else:
         allGenres = session.query(Genre).all()
         return render_template('new-book.html', allGenres=allGenres)
@@ -146,5 +152,6 @@ def superCategoryJSON(super_category_name):
     return jsonify(Genre=[i.serialize for i in genresInCategory])
 
 if __name__ == '__main__':
+    app.secret_key = "super_secret_key"
     app.debug = True
     app.run(host='0.0.0.0', port=5500)

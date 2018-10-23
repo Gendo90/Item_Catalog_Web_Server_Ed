@@ -21,7 +21,16 @@
     <p>A place to review great reads, as suggested by users like you!</p>
   </div>
 
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
 
+    <ul>
+      {% for message in messages %}
+      <li>{{message}}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
 
   <div class=main_container>
     <div class=sidebar>
