@@ -64,21 +64,31 @@
 
     <div class=main_content>
       <div class=new_book_info>
-        <form method="POST" action="{{url_for('addBook')}}">
-          <p>Book Title:</p>
-          <input name='title' type=text placeholder='Title'/>
-          <p>Book Author:</p>
-          <input name='author' type=text placeholder='Author'/>
-          <p>Genre:</p>
-          <select required name='genre'>
-                    {% for item in allGenres %}
-            <option value="{{item.name}}">{{item.name}}</option>
-                    {% endfor %}
-          </select>
-          <p>Book Description:</p>
-          <textarea rows=8 name='description' placeholder="Enter description here"/></textarea>
-          <input class=submit_book type=submit text='Submit' />
-        </form>
+        <div class=new_book_container>
+          <div>
+            <form method="POST" action="{{url_for('addBook')}}">
+              <p>Book Title:</p>
+              <input name='title' type=text placeholder='Title'/>
+              <p>Book Author:</p>
+              <input name='author' type=text placeholder='Author'/>
+              <p>Genre (If you do not see your desired genre on the list below,
+                you can add it first using the button below):</p>
+              <select required name='genre'>
+                        {% for item in allGenres %}
+                <option value="{{item.name}}">{{item.name}}</option>
+                        {% endfor %}
+              </select>
+              <p>Book Description:</p>
+              <textarea rows=8 name='description' placeholder="Enter description here"/></textarea>
+              <input class=submit_book type=submit text='Submit' />
+            </form>
+          </div>
+          <div class="add_genre_holder">
+            <div class=newGenre>
+              <a href='/'><button class=addGenreButton>Add Genre</button></a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

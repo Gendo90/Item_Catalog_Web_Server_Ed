@@ -70,7 +70,7 @@ button, .submit_description, .submit_book {
   margin-top: 60px;
 }
 
-.container, .book_view_container {
+.container, .book_view_container, .new_book_container {
   display: flex;
   flex-direction: row;
 }
@@ -208,7 +208,21 @@ textarea {
   vertical-align: calc((48px / 2) - 5px);
 }
 
+.add_genre_holder {
+  position: relative;
+  min-width: 55px;
+}
 
+.newGenre {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+}
+
+.addGenreButton {
+  margin-left: 24px;
+  width: auto;
+}
 
 @media only screen and (min-width: 800px) {
   .main_content {

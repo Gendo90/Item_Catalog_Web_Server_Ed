@@ -100,6 +100,8 @@ def addBook():
         genre = request.form['genre']
         try:
             thisGenre=session.query(Genre).filter_by(name=genre).one()
+            # checks to see if book title and genre are duplicates, will not add
+            # them if they both are
             if(not session.query(exists().where(BookItem.title==title).where(BookItem.genre_id==thisGenre.id)).scalar()):
                 newBook = BookItem(title=title, author=[author],
                 description=desc,
