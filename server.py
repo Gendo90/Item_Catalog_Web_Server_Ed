@@ -284,11 +284,12 @@ def deleteBook(super_category_name, genre_id, book_id):
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit', methods=['POST'])
 def editBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    thisBook.description = request.form['updated_description']
-    title = thisBook.title
-    session.commit()
-    flash(title + "'s description edited!")
-    return redirect(url_for('viewPage', API_KEY = CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
+    if(login_session['user_id']==thisBook.user_id) #verifies that the book belongs to the user who sent the POST request to change the description
+        thisBook.description = request.form['updated_description']
+        title = thisBook.title
+        session.commit()
+        flash(title + "'s description edited!")
+        return redirect(url_for('viewPage', API_KEY = CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # webpage that creates a new book
 @app.route('/newbook', methods=['GET', 'POST'])
