@@ -157,6 +157,7 @@ def gdisconnect():
     print('In gdisconnect access token is %s', access_token)
     print('User name is: ')
     print(login_session['username'])
+    #add code here to purge All empty genres on logging out of the website
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
@@ -296,7 +297,7 @@ def addGenre():
         newGenre = Genre(name=name, super_category=superCategory)
         session.add(newGenre)
         session.commit()
-        flash(newGenre.name + " added!")
+        flash(newGenre.name + " genre added!")
         allGenres = session.query(Genre).all()
         return render_template('new-book.html', allGenres=allGenres)
     else:
