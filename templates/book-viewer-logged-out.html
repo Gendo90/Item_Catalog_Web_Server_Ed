@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tells the browser what the title of this page should be. -->
+  <title>Best Books Catalog</title>
+  <meta name="description" content="A website listing books that users
+  recommend based on their own reading experiences, and why they recommend
+  these books, categorized by genre.">
+  <meta name="website author" content="Patrick Gendotti">
+
+  <!-- Load the page styles. -->
+  <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet"> <!--"../static/css/style.css"-->
+</head>
+<body>
+  <div class=container>
+    <div class=loggedinheading>
+      <!--GHOST DIV FOR SPACING SO HEADER IS CENTERED!-->
+      <p class=text_blend> Login </p>
+    </div>
+
+    <div class=origheading>
+      <div>
+        <h1>Best Books!</h1>
+        <p>A place to review great reads, as suggested by users like you!</p>
+      </div>
+    </div>
+
+    <div class=loggedinheading>
+      <a href="{{url_for('loginPage')}}"><button class=header_btn type=button>Login</button></a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+
+    <ul>
+      {% for message in messages %}
+      <li>{{message}}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+
+  <div class=main_container>
+    <div class=sidebar>
+      <h2>{{genre.name}}</h2>
+      <div class=sidebar_line></div>
+                                      {% for item in genreBooks %}
+      <div class=sidebar_links>
+        <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_id=item.genre_id, book_id=item.id)}}>{{item.title}}</a></h3>
+        <br />
+      </div>
+                                      {% endfor %}
+      <!--<h5>Science Fiction</h5>
+        <h5>Fantasy</h5>
+      <h3 class=sidebar_links><a href=index.html>Non-Fiction</a></h3>
+        <h5>Cooking</h5>
+        <h5>History</h5>
+        <h5>Health</h5>
+        <h5>Philosophy</h5>
+      <h3 class=sidebar_links><a href=index.html>Reference</a></h3>
+        <h5>Dictionary</h5>
+      <h5>Encyclopedia</h5>-->
+    </div>
+
+    <div class=main_content>
+      <h3 class=book_title>{{book.title}}</h3>
+      <div class=book_view_container>
+
+
+        <div class=book_img_holder>
+          {% if book.imgURL %}
+          <img class=book_img id=stored_img src ="{{book.imgURL}}"/>
+          {% else %}
+          <img class=book_img id=loading_img src = "{{url_for('static', filename='images/Loading_icon.gif')}}"/>
+          {% endif %}
+        </div>
+        <div class=book_info>
+          Author: {{author}}
+          <p class="description" id="current_description">Description: {{book.description}}</p>
+        </div>
+
+      </div>
+      <br />
+      <h3 class=book_title>You might also like:</h3>
+      <p>
+        LIST OTHER RANDOM BOOKS FROM SAME GENRE HERE, NOT INCLUDED IN USER'S
+        COLLECTION ALREADY!!!
+      </p>
+    </div>
+  </div>
+
+  <div class=container>
+    <div>FOOTER GOES HERE</div>
+  </div>
+
+
+
+</body>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+</html>
