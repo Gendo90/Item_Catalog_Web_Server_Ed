@@ -146,12 +146,12 @@ def gconnect():
         return response
 
     stored_access_token = login_session.get('access_token')
-    #stored_gplus_id = login_session.get('gplus_id')
-    #if stored_access_token is not None and gplus_id == stored_gplus_id:
-    #    response = make_response(json.dumps('Current user is already connected.'),
-    #                             200)
-    #    response.headers['Content-Type'] = 'application/json'
-    #    return response
+    stored_gplus_id = login_session.get('gplus_id')
+    if stored_access_token is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps('Current user is already connected.'),
+                                 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
     # Store the access token in the session for later use.
     login_session['access_token'] = credentials.access_token
@@ -179,10 +179,10 @@ def gconnect():
     print("done!")
 
     #checks if this User already exists in the database - if not, adds them!
-    #if(getUserID(login_session['email']) == None):
-    #    createUser(login_session)
+    if(getUserID(login_session['email']) == None):
+        createUser(login_session)
 
-    #login_session['user_id'] = getUserID(login_session['email'])
+    login_session['user_id'] = getUserID(login_session['email'])
     return output
 
  # DISCONNECT - Revoke a current user's token and reset their login_session
