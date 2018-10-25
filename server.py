@@ -328,9 +328,10 @@ def addBook():
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
 def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    thisBook.imgURL = str(imgLocation)
-    session.commit()
-    return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
+    if(login_session['user_id']==thisBook.user_id) #verifies that the book belongs to the user who sent the POST request to set the image
+        thisBook.imgURL = str(imgLocation)
+        session.commit()
+        return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # webpage that creates a new genre, with a form that uses POST to send the
 # server a genre name and super-category the user enters
