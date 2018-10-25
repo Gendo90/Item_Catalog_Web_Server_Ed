@@ -243,7 +243,7 @@ def editBook(super_category_name, genre_id, book_id):
     flash(title + "'s description edited!")
     return redirect(url_for('viewPage', API_KEY = CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
-# inaccessible webpage (uses POST method only) that creates a new book
+# webpage that creates a new book
 @app.route('/newbook', methods=['GET', 'POST'])
 def addBook():
     if(request.method=='POST'):
@@ -276,7 +276,7 @@ def addBook():
         allGenres = session.query(Genre).all()
         return render_template('new-book.html', allGenres=allGenres)
 
-# inaccessible webpage (uses POST method only) that sets the imgURL property
+# webpage that sets the imgURL property
 # for a book
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
 def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
@@ -284,6 +284,24 @@ def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook.imgURL = str(imgLocation)
     session.commit()
     return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
+
+# webpage that creates a new genre, with a form that uses POST to send the
+# server a genre name and super-category the user enters
+@app.route('/newgenre', methods=['GET', 'POST'])
+def addGenre():
+    if(request.method=='POST'):
+        name = request.form['name']
+        superCategoryName = request.form['category']
+        superCategory = session.query(SuperCategory).filter_by(name=superCategoryName).one()
+        newGenre = Genre(name=name, super_category=superCategory)
+        session.add(newGenre)
+        session.commit()
+        flash(newGenre.name + " added!")
+        allGenres = session.query(Genre).all()
+        return render_template('new-book.html', allGenres=allGenres)
+    else:
+        superCategories = session.query(SuperCategory).all()
+        return render_template('new-genre.html', allSuperCategories=superCategories)
 
 # used to get the JSON info for a particular book
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/JSON')
@@ -314,4 +332,4 @@ def superCategoryJSON(super_category_name):
 if __name__ == '__main__':
     app.secret_key = "super_secret_key"
     app.debug = True
-    app.run(host='0.0.0.0', port=5500)
+    app.run(host='0.0.0.0', port=6400)

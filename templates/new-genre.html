@@ -66,26 +66,21 @@
       <div class=new_book_info>
         <div class=new_book_container>
           <div>
-            <form method="POST" action="{{url_for('addBook')}}">
-              <p>Book Title:</p>
-              <input name='title' type=text placeholder='Title'/>
-              <p>Book Author:</p>
-              <input name='author' type=text placeholder='Author'/>
-              <p>Genre (If you do not see your desired genre on the list below,
-                you can add it first using the button below):</p>
-              <select required name='genre'>
-                        {% for item in allGenres %}
+            <form method="POST" action="{{url_for('addGenre')}}">
+              <p>Genre Name:</p>
+              <input name='name' type=text placeholder='Genre'/>
+              <p>Category (Please select from the options below):</p>
+              <select required name='category'>
+                        {% for item in allSuperCategories %}
                 <option value="{{item.name}}">{{item.name}}</option>
                         {% endfor %}
               </select>
-              <p>Book Description:</p>
-              <textarea rows=8 name='description' placeholder="Enter description here"/></textarea>
               <input class=submit_book type=submit text='Submit' />
             </form>
           </div>
           <div class="add_genre_holder">
             <div class=newGenre>
-              <a href="{{url_for('addGenre')}}"><button class=addGenreButton>Add Genre</button></a>
+              <a href="{{url_for('addBook')}}"><button class=addGenreButton>Add Book</button></a>
             </div>
           </div>
         </div>
