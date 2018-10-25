@@ -274,11 +274,12 @@ def viewPage(super_category_name, genre_id, book_id):
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
 def deleteBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    title = thisBook.title
-    session.delete(thisBook)
-    session.commit()
-    flash(title + " removed!")
-    return render_template('index-logged-in.html')
+    if(login_session['user_id']==thisBook.user_id) #verifies that the book belongs to the user who sent the POST request to set the image
+        title = thisBook.title
+        session.delete(thisBook)
+        session.commit()
+        flash(title + " removed!")
+        return render_template('index-logged-in.html')
 
 # inaccessible webpage (uses POST method only) that edits a book's description
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit', methods=['POST'])
