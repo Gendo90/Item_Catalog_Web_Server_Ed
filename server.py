@@ -25,11 +25,10 @@ CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Book Collector App"
 
-engine = create_engine('sqlite:///booklist.db')
+engine = create_engine('sqlite:///booklistwithusers.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind = engine)
 session = DBSession()
-
 
 import urllib
 
@@ -39,6 +38,22 @@ CustomSearchAPIKEY="AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
 # Main page for the website
 @app.route('/')
 def mainPage():
+    # this code adds the three main supercategories upon starting the server
+    # if they are not already present in the database file
+    try:
+        session.query(SuperCategory).filter_by(name='Fiction').one()
+    except:
+        # add super-categories that contain the genres
+        SuperCategory_I = SuperCategory(name="Fiction")
+        session.add(SuperCategory_I)
+
+        SuperCategory_II = SuperCategory(name="Non-Fiction")
+        session.add(SuperCategory_II)
+
+        SuperCategory_III = SuperCategory(name="Reference")
+        session.add(SuperCategory_III)
+
+        session.commit()
     return render_template('index-logged-in.html')
 
 # login page for the website
@@ -51,6 +66,31 @@ def loginPage():
     string.digits) for x in range(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
+
+# User Helper Functions
+
+
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
 
 # GConnect code to authenticate user using the google API
 # With the "client secret" and client # ID
@@ -183,9 +223,12 @@ def gdisconnect():
 @app.route("/<string:super_category_name>/")
 def superCategoryMainPage(super_category_name):
     thisCategory = session.query(SuperCategory).filter_by(name=super_category_name).one()
-    containedGenres = session.query(Genre).filter_by(super_category_id=thisCategory.id).all()
+    try:
+        containedGenres = session.query(Genre).filter_by(super_category_id=thisCategory.id).all()
 
-    return render_template('genreIndex.html', superCategory=thisCategory.name, genres=containedGenres)
+        return render_template('genreIndex.html', superCategory=thisCategory.name, genres=containedGenres)
+    except: # case where there are no genres or books for this user yet
+        return render_template('genreIndex.html', superCategory=thisCategory.name, genres=[])
 
 # code from project.py listing books by genre
 @app.route("/<string:super_category_name>/<int:genre_id>/")
@@ -211,7 +254,10 @@ def viewPage(super_category_name, genre_id, book_id):
             for author in book.author:
                 authors += author + ", "
             authors = authors[:len(authors)-2]
-            return render_template('book-viewer.html', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author = authors)
+            return render_template('book-viewer.html',
+            API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name,
+            genre=genre, genreBooks=genreBooks, book = book,
+            parse_title = title, author = authors)
 
     except:
         genres = session.query(Genre).all()
@@ -259,7 +305,7 @@ def addBook():
             if(not session.query(exists().where(BookItem.title==title).where(BookItem.genre_id==thisGenre.id)).scalar()):
                 newBook = BookItem(title=title, author=[author],
                 description=desc,
-                genre=thisGenre, imgURL=None)
+                genre=thisGenre, imgURL=None, user_id=thisGenre.user_id)
                 session.add(newBook)
                 session.commit()
                 thisBook = session.query(BookItem).filter_by(title=title).one()
@@ -293,8 +339,9 @@ def addGenre():
     if(request.method=='POST'):
         name = request.form['name']
         superCategoryName = request.form['category']
+        user_id = login_session['user_id']
         superCategory = session.query(SuperCategory).filter_by(name=superCategoryName).one()
-        newGenre = Genre(name=name, super_category=superCategory)
+        newGenre = Genre(name=name, super_category=superCategory, user_id=user_id)
         session.add(newGenre)
         session.commit()
         flash(newGenre.name + " genre added!")
@@ -333,4 +380,4 @@ def superCategoryJSON(super_category_name):
 if __name__ == '__main__':
     app.secret_key = "super_secret_key"
     app.debug = True
-    app.run(host='0.0.0.0', port=6400)
+    app.run(host='0.0.0.0', port=5500)
