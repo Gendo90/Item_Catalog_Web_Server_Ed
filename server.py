@@ -34,6 +34,8 @@ session = DBSession()
 import urllib
 
 
+CustomSearchAPIKEY="AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
+
 # Main page for the website
 @app.route('/')
 def mainPage():
@@ -202,13 +204,13 @@ def viewPage(super_category_name, genre_id, book_id):
         title = urllib.parse.quote(book.title)
         #image search api uri: "https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
         if len(book.author)==1:
-            return render_template('book-viewer.html', super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author=book.author[0])
+            return render_template('book-viewer.html', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author=book.author[0])
         else:
             authors = ""
             for author in book.author:
                 authors += author + ", "
             authors = authors[:len(authors)-2]
-            return render_template('book-viewer.html', super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author = authors)
+            return render_template('book-viewer.html', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author = authors)
 
     except:
         genres = session.query(Genre).all()
@@ -239,7 +241,7 @@ def editBook(super_category_name, genre_id, book_id):
     title = thisBook.title
     session.commit()
     flash(title + "'s description edited!")
-    return redirect(url_for('viewPage', super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
+    return redirect(url_for('viewPage', API_KEY = CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # inaccessible webpage (uses POST method only) that creates a new book
 @app.route('/newbook', methods=['GET', 'POST'])
@@ -281,7 +283,7 @@ def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     thisBook.imgURL = str(imgLocation)
     session.commit()
-    return redirect(url_for('viewPage', super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
+    return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
 
 # used to get the JSON info for a particular book
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/JSON')

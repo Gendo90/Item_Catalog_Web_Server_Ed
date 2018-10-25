@@ -117,9 +117,19 @@
   }());
 </script>
 <script>
+  var searchURL = 'https://www.googleapis.com/customsearch/v1';
+  var searchFormatted = $.param({
+    'q': '{{book.title}}',
+    'cx': '012831379883745738680:zo50lyeowzu',
+    'num': 1,
+    'searchType': 'image',
+    'exactTerms': '{{book.title}}',
+    'key': '{{API_KEY}}',
+  });
+  searchURL += "?" + searchFormatted;
   $(function(){
     if($("#loading_img").attr('src')=='/static/images/Loading_icon.gif'){
-    $.getJSON("https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&exactTerms={{parse_title}}&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM", function(data) {
+    $.getJSON(searchURL, function(data) {
 
         var url = `${data.items[0].link}`
         console.log(url)
