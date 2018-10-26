@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, SuperCategory, Genre, BookItem
+from database_setup import Base, User, SuperCategory, Genre, BookItem
 
 # import packages for anti-forgery state token creation
 from flask import session as login_session
@@ -54,6 +54,12 @@ def mainPage():
         session.add(SuperCategory_III)
 
         session.commit()
+
+    try:
+        login_session['user_id']
+    except:
+        login_session['user_id'] = -0.1
+
     return render_template('index-logged-in.html')
 
 # login page for the website
@@ -194,27 +200,40 @@ def gdisconnect():
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print('In gdisconnect access token is %s', access_token)
+    print('In gdisconnect access token is {}'.format(access_token))
     print('User name is: ')
     print(login_session['username'])
     #add code here to purge All empty genres on logging out of the website
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(login_session['access_token'])
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print('result is ')
     print(result)
+    resp, result2 = h.request(url, 'GET')
+    print("The second result is: ")
+    print(result2)
     if result['status'] == '200':
-        #del login_session['access_token'] removed in the general disconnect function
-        #del login_session['gplus_id'] '...'
-        #del login_session['username']
-        #del login_session['email']
-        #del login_session['picture']
-        #del login_session['user_id']
+        del login_session['access_token'] # removed in the general disconnect function (LATER)
+        del login_session['gplus_id'] #'...'
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        login_session['user_id'] = -0.1;
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
+    elif (json.loads(result2)["error_description"] == "Token expired or revoked"):
+        del login_session['access_token'] # removed in the general disconnect function (LATER)
+        del login_session['gplus_id'] #'...'
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        login_session['user_id'] = -0.1
+        response = make_response(json.dumps('Token already revoked - disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(json.dumps('Failed to revoke token for given user.'), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -241,25 +260,49 @@ def listGenre(super_category_name, genre_id):
 # Book Viewer page for the website
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/view')    #api key: AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM
 def viewPage(super_category_name, genre_id, book_id):
+    #ensures there is a login session user id to compare against
+    try:
+        login_session['user_id']
+    except:
+        login_session['user_id'] = -0.1
     genre = session.query(Genre).filter_by(id = genre_id).one()
     genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
     try:
         book = session.query(BookItem).filter_by(id = book_id).one()
         title = urllib.parse.quote(book.title)
-        #image search api uri: "https://www.googleapis.com/customsearch/v1?q={{parse_title}}&cx=012831379883745738680%3Azo50lyeowzu&num=1&searchType=image&key=AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
         if len(book.author)==1:
-            return render_template('book-viewer.html', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre=genre, genreBooks=genreBooks, book = book, parse_title = title, author=book.author[0])
+            # makes sure the page only loads the edit and delete info if the
+            # user is logged in and it is their book!
+            if(login_session['user_id']==book.user_id):
+                return render_template('book-viewer.html',
+                API_KEY=CustomSearchAPIKEY,
+                super_category_name=super_category_name, genre=genre,
+                genreBooks=genreBooks, book = book, parse_title = title,
+                author=book.author[0])
+            else:
+                return render_template('book-viewer-logged-out.html',
+                super_category_name=super_category_name, genre=genre,
+                genreBooks=genreBooks, book = book, parse_title = title,
+                author=book.author[0])
         else:
             authors = ""
             for author in book.author:
                 authors += author + ", "
             authors = authors[:len(authors)-2]
-            return render_template('book-viewer.html',
-            API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name,
-            genre=genre, genreBooks=genreBooks, book = book,
-            parse_title = title, author = authors)
+            # makes sure the page only loads the edit and delete info if the
+            # user is logged in and it is their book!
+            if(login_session['user_id']==book.user_id):
+                return render_template('book-viewer.html',
+                API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name,
+                genre=genre, genreBooks=genreBooks, book = book,
+                parse_title = title, author = authors)
+            else:
+                return render_template('book-viewer-logged-out.html',
+                super_category_name=super_category_name,
+                genre=genre, genreBooks=genreBooks, book = book,
+                parse_title = title, author = authors)
 
-    except:
+    except: # debug code to see what is in the db
         genres = session.query(Genre).all()
         outputI = "Genre IDs:"
         for i in genres:
@@ -274,7 +317,7 @@ def viewPage(super_category_name, genre_id, book_id):
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
 def deleteBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    if(login_session['user_id']==thisBook.user_id) #verifies that the book belongs to the user who sent the POST request to set the image
+    if(login_session['user_id']==thisBook.user_id): #verifies that the book belongs to the user who sent the POST request to set the image
         title = thisBook.title
         session.delete(thisBook)
         session.commit()
@@ -285,7 +328,7 @@ def deleteBook(super_category_name, genre_id, book_id):
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit', methods=['POST'])
 def editBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    if(login_session['user_id']==thisBook.user_id) #verifies that the book belongs to the user who sent the POST request to change the description
+    if(login_session['user_id']==thisBook.user_id): #verifies that the book belongs to the user who sent the POST request to change the description
         thisBook.description = request.form['updated_description']
         title = thisBook.title
         session.commit()
@@ -330,7 +373,7 @@ def addBook():
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
 def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    if(login_session['user_id']==thisBook.user_id) #verifies that the book belongs to the user who sent the POST request to set the image
+    if(login_session['user_id']==thisBook.user_id): #verifies that the book belongs to the user who sent the POST request to set the image
         thisBook.imgURL = str(imgLocation)
         session.commit()
         return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
