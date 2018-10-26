@@ -126,6 +126,12 @@ div.sidebar_links {
   border-style: solid;
 }
 
+.login_successful {
+  padding-top: 25vh;
+  margin: auto;
+  text-align: center;
+}
+
 .login_space {
   width: 300px;
   height: 150px;
