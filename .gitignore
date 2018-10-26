@@ -2,4 +2,6 @@ booklist.db
 booklistwithusers.db
 Client ID.txt
 Client Secret.txt
+client_secrets.json
+fb_client_secrets.json
 __pycache__
