@@ -13,6 +13,7 @@ session = DBSession()
 
 try:
     for item in session.query(SuperCategory).all():
+        print(item.name)
         session.remove(item)
     session.commit()
 except:
