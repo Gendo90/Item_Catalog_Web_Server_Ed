@@ -73,8 +73,10 @@ def loginPage():
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
-# User Helper Functions
 
+# User Helper Functions - work with the User class of objects from the
+# database_setup.py file to create and get information about logged-in
+# website users
 
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
@@ -100,8 +102,8 @@ def getUserID(email):
 
 # GConnect code to authenticate user using the google API
 # With the "client secret" and client # ID
-# ALso verifies that the request comes from the browser with the same anti-forgery state
-# token as the one provided by the browser.
+# ALso verifies that the request comes from the browser with the same
+# anti-forgery state token as the one provided by the browser.
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -192,6 +194,7 @@ def gconnect():
     return output
 
  # DISCONNECT - Revoke a current user's token and reset their login_session
+ # for Google logins/users only!
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
@@ -203,7 +206,6 @@ def gdisconnect():
     print('In gdisconnect access token is {}'.format(access_token))
     print('User name is: ')
     print(login_session['username'])
-    #add code here to purge All empty genres on logging out of the website
     url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(login_session['access_token'])
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
@@ -213,21 +215,19 @@ def gdisconnect():
     print("The second result is: ")
     print(result2)
     if result['status'] == '200':
-        #del login_session['access_token'] # removed in the general disconnect function (LATER)
-        #del login_session['gplus_id'] #'...'
-        #del login_session['username']
-        #del login_session['email']
-        #del login_session['picture']
+        # user_id field is always an integer as defined in the User class, so
+        # if there is no user currently logged-in to the site, setting the
+        # user_id to a fraction here signifies that no valid user is
+        # currently logged-in
         login_session['user_id'] = -0.1;
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     elif (json.loads(result2)["error_description"] == "Token expired or revoked"):
-        #del login_session['access_token'] # removed in the general disconnect function (LATER)
-        #del login_session['gplus_id'] #'...'
-        #del login_session['username']
-        #del login_session['email']
-        #del login_session['picture']
+        # user_id field is always an integer as defined in the User class, so
+        # if there is no user currently logged-in to the site, setting the
+        # user_id to a fraction here signifies that no valid user is
+        # currently logged-in
         login_session['user_id'] = -0.1
         response = make_response(json.dumps('Token already revoked - disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
@@ -270,11 +270,9 @@ def fbconnect():
     print(result)
     token = result.decode("utf-8").split(',')[0].split(':')[1].replace('"', '') # result must be decoded because it is in bytes not string
 
-    url = 'https://graph.facebook.com/v3.2/me?access_token=%s&fields=name,id,email' % token #was v2.8 before
+    url = 'https://graph.facebook.com/v3.2/me?access_token=%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-    # print "url sent for API access:%s"% url
-    # print "API JSON result: %s" % result
     data = json.loads(result)
     login_session['provider'] = 'facebook'
     login_session['username'] = data["name"]
@@ -285,15 +283,16 @@ def fbconnect():
     login_session['access_token'] = token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v3.2/me/picture?access_token=%s&redirect=0&height=200&width=200' % token #was v2.8 before
+    url = 'https://graph.facebook.com/v3.2/me/picture?access_token=%s&redirect=0&height=200&width=200' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
 
     login_session['picture'] = data["data"]["url"]
 
-    # see if user exists
-    user_id = getUserID(login_session['email']) # does not work in my case because I use different emails?
+    # see if user exists by checking id from online user vs. this site's
+    # database
+    user_id = getUserID(login_session['email'])
     print(login_session['email'])
     if not user_id:
         user_id = createUser(login_session)
@@ -314,7 +313,7 @@ def fbconnect():
 @app.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
-    # The access token must me included to successfully logout
+    # The access token must be included to successfully logout
     access_token = login_session['access_token']
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
     h = httplib2.Http()
@@ -322,7 +321,8 @@ def fbdisconnect():
     return "you have been logged out"
 
 
- # Disconnect based on provider
+ # Disconnect based on provider - will disconnect for both Google and Facebook
+ # OAuth sessions presently
 @app.route('/disconnect')
 def disconnect():
     if 'provider' in login_session:
@@ -335,7 +335,7 @@ def disconnect():
             del login_session['facebook_id']
         del login_session['username']
         # remove empty genres for this user that have no books in them!
-        # must be done before user_id is deleted
+        # must be done before login_session['email'] is deleted
         user_id = getUserID(login_session['email'])
         user_Genres = session.query(Genre).filter_by(user_id=user_id).all()
         for genre in user_Genres:
@@ -355,8 +355,9 @@ def disconnect():
         flash("You were not logged in")
         return redirect(url_for('mainPage'))
 
-# First of three super-categories that link to different pages - refactor
-# later to make the three super-categories part of a table in the database
+# Three super-categories that link to different pages - the string name should
+# be "Fiction", "Non-Fiction", or "Reference" to get valid results for the
+# genres in those super-categories
 @app.route("/<string:super_category_name>/")
 def superCategoryMainPage(super_category_name):
     thisCategory = session.query(SuperCategory).filter_by(name=super_category_name).one()
@@ -364,10 +365,11 @@ def superCategoryMainPage(super_category_name):
         containedGenres = session.query(Genre).filter_by(super_category_id=thisCategory.id).all()
 
         return render_template('genreIndex.html', superCategory=thisCategory.name, genres=containedGenres)
-    except: # case where there are no genres or books for this user yet
+    except: # case where there are no genres or books for this user yet - like
+            # a new user!
         return render_template('genreIndex.html', superCategory=thisCategory.name, genres=[])
 
-# code from project.py listing books by genre
+# webpage listing books within a particular genre
 @app.route("/<string:super_category_name>/<int:genre_id>/")
 def listGenre(super_category_name, genre_id):
     genre = session.query(Genre).filter_by(id = genre_id).one()
@@ -376,9 +378,9 @@ def listGenre(super_category_name, genre_id):
     return render_template('genre-list.html', super_category_name=super_category_name, genre=genre, bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
 
 # Book Viewer page for the website
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/view')    #api key: AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/view')
 def viewPage(super_category_name, genre_id, book_id):
-    #ensures there is a login session user id to compare against
+    # ensures there is a login session user id to compare against
     try:
         login_session['user_id']
     except:
@@ -420,7 +422,7 @@ def viewPage(super_category_name, genre_id, book_id):
                 genre=genre, genreBooks=genreBooks, book = book,
                 parse_title = title, author = authors)
 
-    except: # debug code to see what is in the db
+    except: # debug code to see what is in the database (genre and book IDs)
         genres = session.query(Genre).all()
         outputI = "Genre IDs:"
         for i in genres:
@@ -432,7 +434,8 @@ def viewPage(super_category_name, genre_id, book_id):
         return outputI + outputII
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete', methods=['POST'])
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete',
+methods=['POST'])
 def deleteBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     if(login_session['user_id']==thisBook.user_id): #verifies that the book belongs to the user who sent the POST request to set the image
@@ -443,7 +446,8 @@ def deleteBook(super_category_name, genre_id, book_id):
         return render_template('index-logged-in.html')
 
 # inaccessible webpage (uses POST method only) that edits a book's description
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit', methods=['POST'])
+@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit',
+methods=['POST'])
 def editBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
     if(login_session['user_id']==thisBook.user_id): #verifies that the book belongs to the user who sent the POST request to change the description
@@ -486,8 +490,8 @@ def addBook():
         allGenres = session.query(Genre).all()
         return render_template('new-book.html', allGenres=allGenres)
 
-# webpage that sets the imgURL property
-# for a book
+# webpage that sets the imgURL property for a book so that a picture appears
+# on the book-viewer page
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
 def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
@@ -498,6 +502,8 @@ def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
 
 # webpage that creates a new genre, with a form that uses POST to send the
 # server a genre name and super-category the user enters
+# Accessible from the new-book page, so that the user can conveniently add a
+# genre before adding a book to it!
 @app.route('/newgenre', methods=['GET', 'POST'])
 def addGenre():
     if(request.method=='POST'):
@@ -542,6 +548,7 @@ def superCategoryJSON(super_category_name):
     return jsonify(Genre=[i.serialize for i in genresInCategory])
 
 if __name__ == '__main__':
+    # secret key used here to enable flash messages
     app.secret_key = "super_secret_key"
     app.debug = True
     app.run(host='0.0.0.0', port=5500)
