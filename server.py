@@ -334,6 +334,17 @@ def disconnect():
             fbdisconnect()
             del login_session['facebook_id']
         del login_session['username']
+        # remove empty genres for this user that have no books in them!
+        # must be done before user_id is deleted
+        user_id = getUserID(login_session['email'])
+        user_Genres = session.query(Genre).filter_by(user_id=user_id).all()
+        for genre in user_Genres:
+            user_Books = session.query(BookItem).filter(BookItem.user_id==user_id, BookItem.genre_id==genre.id).all()
+            if user_Books==[]:
+                print("Removing '" + genre.name + "' user's genres!")
+                session.delete(genre)
+                session.commit()
+                flash("'" + genre.name + "' genre removed - empty of books!")
         del login_session['email']
         del login_session['picture']
         login_session['user_id'] = -0.1
