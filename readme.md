@@ -7,86 +7,71 @@ read or would like to read, and also hopefully introduce them to some new
 favorites. This project uses the Flask framework to handle interactions
 between back-end server code and front-end HTML, CSS, and JavaScript code, and
 keeps track of information (e.g. books, genres, etc.) using SQLAlchemy's ORM
-database functions. 
-
-##---copied from earlier, full-stack project for structure/formatting!---
-
+database methods.
 
 ## Setup
 
-This script and its functions are used to give plain text results to a user
-for some basic database queries to the newspaper ('news') database. This
-newspaper database must be located in the shared "vagrant" folder that is
-made by unzipping the "FSND-Virtual-Machine" zip file provided by this course.
-The newspaper database comes from the "newsdata.sql" file available [here][1].
-This "newsdata.sql" database file must be located in the "vagrant"
-folder mentioned above.
+This website is run from the "application.py" python script which acts as the
+"server" or back-end application. You can run this directly without creating a
+script to load the database with information first, but it is recommended that
+you create and run a script similar to "preload_booklist_with_users.py" so that
+the "booklistwithusers.db" is created **before** running the server and is
+populated with some books and their descriptions, genres, etc. You could make
+the entries with the user_id set to 1, which signifies the first user of the
+website, which would be **you**, assuming you login before anyone else. If you
+decide not to create a script to load all your books and genres into the
+website's database, the main page of the website will load only the three main
+"SuperCategory" entries into the database (e.g. "Fiction", "Non-Fiction", and
+"Reference") when accessed, without any genres or books for any users. Thus,
+you would need to manually add all the genres and books you want for yourself,
+because the database is empty other than those three SuperCategory entities.
 
-Once the "newsdata.sql" database file has been correctly extracted and placed,
-the user needs to add the 'news' database to the Virtual Machine (VM). This
-can be done first navigating to the "vagrant" folder on your computer, then
-starting your VM by entering the command `vagrant up`. After the VM starts,
-you need to login by entering the `vagrant ssh` command. Then you can enter
-the command `psql -d news -f newsdata.sql`, which loads the database from
-the "newsdata.sql" file into the VM and names the database there 'news'.
+Regardless of whether or not a database is created before running the
+"application.py" server script, the script should be run from the command line
+by entering the `python application.py` command after having navigated to the
+directory containing the "application.py" file. The directory structure is
+highly rigid for this application, because the Flask framework requires
+certain folders to be named "templates" and "static", so the server may not
+work correctly if any of the files in these folders are moved, or deleted, so
+please maintain the directory structure as it is given to ensure the server
+works properly. You can learn more about this requirement in Flask
+[here for templates][1] and [here for static files][2].
 
+After running the `python application.py` command, you should be able to access
+the website application at the "localhost:8000" address in a browser. Login is
+required for adding, editing, or deleting books or genres and each user can
+only access their own books that they have entered at this time after logging
+in to their account. Users currently have two options for logging into the
+website, because they can verify their identities and get access to their
+account using either their Google or Facebook login credentials.
 
-Next, the user needs to place this script (**news_queries_script.py**) into the
-"vagrant" folder for it to run properly. Then you can navigate to the
-**news_queries_script.py** file using the command line, located in the shared
-"vagrant" folder. Once you find the directory containing the
-**news_queries_script.py** file, you should enter
-`python news_queries_script.py` to get the plain text results to the database
-queries for the 'news' database, from the "newsdata.sql" database file. These
-queries rank the most popular articles on the web site by number of views, the
-most popular authors on the site by number of views of their articles, and the
-dates when the percentage error of website loadings by visitors exceeded a
-specified tolerance, which was 1% in this case.
 
 ### Example Usage
 
-#### Popular Articles
+#### Login
 
-The first example query gives the most popular articles on the website, ranked
-by number of views by visitors. The code used to get this result in plain text
-that a user can read is given as:
-```
-sql_raw_output = most_pop_articles()
-format_pop_articles(sql_raw_output)
-```
-That code will print out a list of the most popular articles in order from
-most- to least-viewed on the website, and will give you the number of views
-per article.
+The user can login from the main page of the website, accessible at
+"localhost:8000", by clicking on the "Login" button on the right side of the
+header. This button will bring the user to a page where they can select to
+login using either their Google or their Facebook account. Once they have
+successfully logged in using one of these accounts, the page will change to
+show their profile picture and let them know that they have logged in
+successfully, and then will redirect to the main page of the website. The user
+will now have access to their books and genres and the capability to add more
+books and genres to their account. The "Login" button on the right side of the
+header will be replaced with a "Logout" button.
 
-#### Popular Authors
+#### Add A Genre
 
-The second example query gives the most popular authors on the website, ranked
-by number of views of their articles on the site by visitors. The code used to
-get this result in plain text that a user can read is given as:
-```
-sql_raw_output = most_pop_authors()
-format_pop_authors(sql_raw_output)
-```
-That code will print out a list of the most popular authors in order from
-most visits to least visits to all their articles on the website, and will
-give you the total number of visits for each author's body of work.
 
-#### Failed Load Rate
+#### Add A Book
 
-The third example query checks the database 'logs' table for the number of
-failed and correct loads of the website by visitors each day, and outputs the
-date(s) when the percentage of failed loads of the website was greater than a
-given error tolerance (1% in this case). The code that will give the date(s)
-and the error rates for those dates that exceeds this tolerance in plain text
-is given as:
-```
-test_dates, test_error, first_day, last_day = over_perc_error()
-print_over_perc_err_dates(test_dates, test_error, first_day, last_day)
-```
-Which will give a clear, plain text printout of the dates and error rates that
-a user can easily read. This code also gives the start and end dates for the
-period of time that is examined for errors percentages that could be greater
-than the given tolerance.
+
+#### Logout
+
+
+
+##---copied from earlier, full-stack project for structure/formatting!---
 
 ## Major Functions
 
@@ -112,84 +97,12 @@ rate is modifiable in the `check_perc_error()` sub-function that runs as part
 of this `over_perc_error()` function. This function also prints the date range
 that will be examined for unacceptable error rates.
 
-## Minor/Supporting Functions
+## Planned Features/Current Limitations
 
-Here are some of the supporting functions and sub-functions, grouped by the
-different purposes they serve and functions they can be used with.
+A planned, upcoming feature is the ability to view random selections of other
+users' books, based on genre names that match genres in your personal
+collection, as well as some random books that will be featured on the public
+area of the website for any site visitors.
 
-### Formatting & Sub-Functions Functions for `most_pop_articles()`
-
-#### `pop_articles_query_string()`
-
-Used to store the query string that is used by the `most_pop_articles()`
-function to query the news database and get the desired results in table form.
-Returns the query string that is used with `most_pop_articles()` **execute**
-statement.
-
-#### `format_SQL_output()`
-
-Used to split an input list of tuples that represent values from the SQL table
-that share the same row and have different columns into two lists that
-represent the values of the columns in the same order with the same length.
-
-#### `format_pop_articles()`
-
-This function gets as input the two lists made by `format_SQL_output()` from
-the SQL list of tuples that was the output of `most_pop_articles()`, because
-those lists represent the columns from that table with values for the article
-names and the number of views of each article. This function formats those
-results into plain text that a human user can understand.
-
-### Formatting Functions & Sub-Functions for `most_pop_authors()`
-
-#### `pop_authors_query_string()`
-
-Used to store the query string that is used by the `most_pop_authors()`
-function to query the news database and get the desired results in table form.
-Returns the query string that is used with `most_pop_authors()` **execute**
-statement. Also uses the `pop_articles_query_string()` as a building-block for
-its own query string, with a variable name replaced due to a similar name.
-
-#### `format_SQL_output()`
-
-Used to split an input list of tuples that represent values from the SQL table
-that share the same row and have different columns into two lists that
-represent the values of the columns in the same order with the same length.
-
-#### `format_pop_authors()`
-
-This function gets as input the two lists made by `format_SQL_output()` from
-the SQL list of tuples that was the output of `most_pop_authors()`, because
-those lists represent the columns from that table with values for the author
-names and the number of views of each author's work. This function formats
-those results into plain text that a human user can understand.
-
-### Formatting & Sub-Functions for `over_perc_error()`
-
-#### Sub-Function: `make_loaded_by_date_table()`
-
-Queries the SQL 'news' database to find the dates, number of erroneous loads of
-the website, and number of correct loads of the website. Outputs this
-information as a list containing each row as a tuple.
-
-#### Sub-Function: `check_perc_error()`
-
-Takes in the list of tuples from the output of the `make_loaded_by_date_table()`
-and determines which dates had unacceptable error rates, given a certain
-error percentage (1% in this case, defined in this function as the variable
-perc_err_threshold). The function compares the number of erroneous loads to the
-total number of loads to get this actual error percentage rate. The output is
-two lists that represent the date and the error percentage that was over the
-limit, and two dates that represent the first and last date the website
-loadings were examined, to provide a date range as context.
-
-#### Formatting: `print_over_perc_err_dates()`
-
-This function gets as input the two lists output by `over_perc_error()` that
-represent the dates when the percentage error in loadings was too high,
-and what that percentage was for those dates. It also gets the output dates
-from the `over_perc_error()` function because they give the date range over
-which the percentage errors were examined for each day. This function
-formats all these results into plain text that a human user can understand.
-
-[1]: /newsdata.sql
+[1]: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
+[2]: http://exploreflask.com/en/latest/static.html
