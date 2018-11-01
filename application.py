@@ -1,8 +1,9 @@
-from flask import Flask, render_template, url_for, request, redirect, jsonify, flash
+#!/usr/bin/env python3
+from flask import Flask, render_template, url_for, redirect, jsonify, flash
 app = Flask(__name__)
 
 from sqlalchemy import create_engine, exists
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, exc
 from database_setup import Base, User, SuperCategory, Genre, BookItem
 
 # import packages for anti-forgery state token creation
@@ -18,22 +19,24 @@ from flask import make_response
 import requests
 
 # Some global variables that are used in the GConnect function
-# NOTE: need to download the 'client_secrets.json' from the google account AFTER
-# updating the certification on the google account to allow redirection to BOTH
-# http://localhost:5000/login and http://localhost:5000/gconnect or it will not work
+# NOTE: need to download the 'client_secrets.json' from the google account
+# AFTER updating the certification on the google account to allow redirection
+# to BOTH http://localhost:8000/login and http://localhost:8000/gconnect
+# or it will not work
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Book Collector App"
 
 engine = create_engine('sqlite:///booklistwithusers.db')
 Base.metadata.bind = engine
-DBSession = sessionmaker(bind = engine)
+DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 import urllib
 
 
-CustomSearchAPIKEY="AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
+CustomSearchAPIKEY = "AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
+
 
 # Main page for the website
 @app.route('/')
@@ -42,7 +45,7 @@ def mainPage():
     # if they are not already present in the database file
     try:
         session.query(SuperCategory).filter_by(name='Fiction').one()
-    except:
+    except exc.NoResultFound:
         # add super-categories that contain the genres
         SuperCategory_I = SuperCategory(name="Fiction")
         session.add(SuperCategory_I)
@@ -57,10 +60,11 @@ def mainPage():
 
     try:
         login_session['user_id']
-    except:
+    except KeyError:
         login_session['user_id'] = -0.1
 
     return render_template('index-logged-in.html')
+
 
 # login page for the website
 # Create a state token to prevent request forgery.
@@ -69,7 +73,7 @@ def mainPage():
 @app.route('/login/')
 def loginPage():
     state = ''.join(random.choice(string.ascii_uppercase +
-    string.digits) for x in range(32))
+            string.digits) for x in range(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
@@ -121,7 +125,7 @@ def gconnect():
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(
-            json.dumps('Failed to upgrade the authorization code.'), 401)
+                json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -156,8 +160,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+                json.dumps('Current user is already connected.'),200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -182,7 +186,8 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;\
+            -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
 
@@ -206,7 +211,8 @@ def gdisconnect():
     print('In gdisconnect access token is {}'.format(access_token))
     print('User name is: ')
     print(login_session['username'])
-    url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(login_session['access_token'])
+    url = 'https://accounts.google.com/o/oauth2/revoke?token={}'.format(
+                login_session['access_token'])
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print('result is ')
@@ -223,17 +229,20 @@ def gdisconnect():
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
-    elif (json.loads(result2)["error_description"] == "Token expired or revoked"):
+    elif (json.loads(result2)["error_description"] ==
+                                "Token expired or revoked"):
         # user_id field is always an integer as defined in the User class, so
         # if there is no user currently logged-in to the site, setting the
         # user_id to a fraction here signifies that no valid user is
         # currently logged-in
         login_session['user_id'] = -0.1
-        response = make_response(json.dumps('Token already revoked - disconnected.'), 200)
+        response = make_response(json.dumps('Token already revoked \
+                    - disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.'), 400)
+        response = make_response(json.dumps('Failed to revoke token \
+                    for given user.'), 400)
         response.headers['Content-Type'] = 'application/json'
         return response
 
