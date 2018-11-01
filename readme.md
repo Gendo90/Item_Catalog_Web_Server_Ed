@@ -104,5 +104,22 @@ users' books, based on genre names that match genres in your personal
 collection, as well as some random books that will be featured on the public
 area of the website for any site visitors.
 
+Another planned upgrade would allow more books to be added each day, while
+enabling a revenue stream as an Amazon Associate. This upgrade consists of
+replacing the Google Custom Search API currently used to find book cover
+images with an Amazon API that returns images for their book products. This
+restricts the image search work only when locating products that Amazon has, but
+their product database is extensive, so most books can be found without any
+issues. As a benefit, however, this upgrade would allow unlimited image searches
+every day, and could generate income for the website from purchases made by
+users referred to Amazon through a link to the book attached to the book image.
+The unlimited image searches per day would be a huge improvement over the
+current Google Custom Search API which allows up to **100 searches for free**
+before paying them to allow more searches. Google's Custom Search API was used
+during development because it is easier to access than Amazon's Associate APIs,
+since the website needs a formal address to even register as an Amazon
+Associate. The documentation from Google is more comprehensive and makes their
+API easier to implement as well.
+
 [1]: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
 [2]: http://exploreflask.com/en/latest/static.html
