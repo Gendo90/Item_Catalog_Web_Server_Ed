@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from flask import Flask, render_template, url_for, redirect, jsonify, flash
-app = Flask(__name__)
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker, exc
@@ -8,7 +7,8 @@ from database_setup import Base, User, SuperCategory, Genre, BookItem
 
 # import packages for anti-forgery state token creation
 from flask import session as login_session
-import random, string
+import random
+import string
 
 # import packages for google oauth login
 from oauth2client.client import flow_from_clientsecrets
@@ -17,6 +17,10 @@ import httplib2
 import json
 from flask import make_response
 import requests
+import urllib
+
+# create the flask object "app"
+app = Flask(__name__)
 
 # Some global variables that are used in the GConnect function
 # NOTE: need to download the 'client_secrets.json' from the google account
@@ -31,9 +35,6 @@ engine = create_engine('sqlite:///booklistwithusers.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
-
-import urllib
-
 
 CustomSearchAPIKEY = "AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
 
@@ -73,7 +74,7 @@ def mainPage():
 @app.route('/login/')
 def loginPage():
     state = ''.join(random.choice(string.ascii_uppercase +
-            string.digits) for x in range(32))
+                    string.digits) for x in range(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
@@ -100,7 +101,7 @@ def getUserID(email):
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
-    except:
+    except exc.NoResultFound:
         return None
 
 
@@ -161,7 +162,7 @@ def gconnect():
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
         response = make_response(
-                json.dumps('Current user is already connected.'),200)
+                json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -191,21 +192,23 @@ def gconnect():
     flash("you are now logged in as %s" % login_session['username'])
     print("done!")
 
-    #checks if this User already exists in the database - if not, adds them!
-    if(getUserID(login_session['email']) == None):
+    # checks if this User already exists in the database - if not, adds them!
+    if(getUserID(login_session['email']) is None):
         createUser(login_session)
 
     login_session['user_id'] = getUserID(login_session['email'])
     return output
 
- # DISCONNECT - Revoke a current user's token and reset their login_session
- # for Google logins/users only!
+
+# DISCONNECT - Revoke a current user's token and reset their login_session
+# for Google logins/users only!
 @app.route('/gdisconnect')
 def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print('Access Token is None')
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps(
+                                'Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     print('In gdisconnect access token is {}'.format(access_token))
@@ -225,12 +228,12 @@ def gdisconnect():
         # if there is no user currently logged-in to the site, setting the
         # user_id to a fraction here signifies that no valid user is
         # currently logged-in
-        login_session['user_id'] = -0.1;
+        login_session['user_id'] = -0.1
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
     elif (json.loads(result2)["error_description"] ==
-                                "Token expired or revoked"):
+                    "Token expired or revoked"):
         # user_id field is always an integer as defined in the User class, so
         # if there is no user currently logged-in to the site, setting the
         # user_id to a fraction here signifies that no valid user is
@@ -246,6 +249,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
     if request.args.get('state') != login_session['state']:
@@ -254,19 +258,19 @@ def fbconnect():
         return response
     access_token = request.data
     print("access token received {} ".format(access_token))
-
-
+    # loads fb client secret from downloaded .json file here
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
         'web']['app_id']
     app_secret = json.loads(
         open('fb_client_secrets.json', 'r').read())['web']['app_secret']
-    url = 'https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=%s&client_secret=%s&fb_exchange_token=%s' % (
-        app_id, app_secret, access_token.decode('utf-8')) # access token must be decoded because it is in bytes not string
+    url = 'https://graph.facebook.com/oauth/access_token?\
+            grant_type=fb_exchange_token&client_id=%s&client_secret=%s&\
+            fb_exchange_token=%s' % (
+        app_id, app_secret, access_token.decode('utf-8'))  # access token must
+    # be decoded here because it is in bytes not string
     print(url)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-
-
     # Use token to get user info from API
     userinfo_url = "https://graph.facebook.com/v3.2/me"
     '''
