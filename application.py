@@ -274,16 +274,20 @@ def fbconnect():
     # Use token to get user info from API
     userinfo_url = "https://graph.facebook.com/v3.2/me"
     '''
-        Due to the formatting for the result from the server token exchange we have to
-        split the token first on commas and select the first index which gives us the key : value
-        for the server access token then we split it on colons to pull out the actual token value
-        and replace the remaining quotes with nothing so that it can be used directly in the graph
-        api calls
+        Due to the formatting for the result from the server token exchange we
+        have to split the token first on commas and select the first index
+        which gives us the key : value for the server access token then we
+        split it on colons to pull out the actual token value and replace the
+        remaining quotes with nothing so that it can be used directly in the
+        graph api calls
     '''
     print(result)
-    token = result.decode("utf-8").split(',')[0].split(':')[1].replace('"', '') # result must be decoded because it is in bytes not string
+    # result must be decoded because it is in bytes not string
+    token = result.decode("utf-8").split(
+            ',')[0].split(':')[1].replace('"', '')
 
-    url = 'https://graph.facebook.com/v3.2/me?access_token=%s&fields=name,id,email' % token
+    url = 'https://graph.facebook.com/v3.2/me?access_token=%s&\
+            fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -296,7 +300,8 @@ def fbconnect():
     login_session['access_token'] = token
 
     # Get user picture
-    url = 'https://graph.facebook.com/v3.2/me/picture?access_token=%s&redirect=0&height=200&width=200' % token
+    url = 'https://graph.facebook.com/v3.2/me/picture?\
+            access_token=%s&redirect=0&height=200&width=200' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     data = json.loads(result)
@@ -318,7 +323,8 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;\
+                -webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 
     flash("Now logged in as %s" % login_session['username'])
     return output
@@ -328,7 +334,8 @@ def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must be included to successfully logout
     access_token = login_session['access_token']
-    url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
+    url = 'https://graph.facebook.com/%s/permissions?\
+            access_token=%s' % (facebook_id,access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
@@ -352,7 +359,8 @@ def disconnect():
         user_id = getUserID(login_session['email'])
         user_Genres = session.query(Genre).filter_by(user_id=user_id).all()
         for genre in user_Genres:
-            user_Books = session.query(BookItem).filter(BookItem.user_id==user_id, BookItem.genre_id==genre.id).all()
+            user_Books = session.query(BookItem).filter(
+                BookItem.user_id==user_id, BookItem.genre_id==genre.id).all()
             if user_Books==[]:
                 print("Removing '" + genre.name + "' user's genres!")
                 session.delete(genre)
@@ -373,14 +381,18 @@ def disconnect():
 # genres in those super-categories
 @app.route("/<string:super_category_name>/")
 def superCategoryMainPage(super_category_name):
-    thisCategory = session.query(SuperCategory).filter_by(name=super_category_name).one()
+    thisCategory = session.query(
+            SuperCategory).filter_by(name=super_category_name).one()
     try:
-        containedGenres = session.query(Genre).filter_by(super_category_id=thisCategory.id).all()
+        containedGenres = session.query(
+                Genre).filter_by(super_category_id=thisCategory.id).all()
 
-        return render_template('genreIndex.html', superCategory=thisCategory.name, genres=containedGenres)
+        return render_template('genreIndex.html',
+                superCategory=thisCategory.name, genres=containedGenres)
     except: # case where there are no genres or books for this user yet - like
             # a new user!
-        return render_template('genreIndex.html', superCategory=thisCategory.name, genres=[])
+        return render_template('genreIndex.html',
+                superCategory=thisCategory.name, genres=[])
 
 # webpage listing books within a particular genre
 @app.route("/<string:super_category_name>/<int:genre_id>/")
@@ -388,7 +400,10 @@ def listGenre(super_category_name, genre_id):
     genre = session.query(Genre).filter_by(id = genre_id).one()
     genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
 
-    return render_template('genre-list.html', super_category_name=super_category_name, genre=genre, bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
+    return render_template('genre-list.html',
+            super_category_name=super_category_name, genre=genre,
+            bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
+
 
 # Book Viewer page for the website
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/view')
@@ -426,14 +441,15 @@ def viewPage(super_category_name, genre_id, book_id):
             # user is logged in and it is their book!
             if(login_session['user_id']==book.user_id):
                 return render_template('book-viewer.html',
-                API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name,
-                genre=genre, genreBooks=genreBooks, book = book,
-                parse_title = title, author = authors)
+                    API_KEY=CustomSearchAPIKEY,
+                    super_category_name=super_category_name,
+                    genre=genre, genreBooks=genreBooks, book = book,
+                    parse_title = title, author = authors)
             else:
                 return render_template('book-viewer-logged-out.html',
-                super_category_name=super_category_name,
-                genre=genre, genreBooks=genreBooks, book = book,
-                parse_title = title, author = authors)
+                    super_category_name=super_category_name,
+                    genre=genre, genreBooks=genreBooks, book = book,
+                    parse_title = title, author = authors)
 
     except: # debug code to see what is in the database (genre and book IDs)
         genres = session.query(Genre).all()
@@ -451,7 +467,9 @@ def viewPage(super_category_name, genre_id, book_id):
 methods=['POST'])
 def deleteBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    if(login_session['user_id']==thisBook.user_id): #verifies that the book belongs to the user who sent the POST request to set the image
+    #verifies that the book belongs to the user who sent the POST request
+    # to set the image
+    if(login_session['user_id']==thisBook.user_id):
         title = thisBook.title
         session.delete(thisBook)
         session.commit()
@@ -463,12 +481,16 @@ def deleteBook(super_category_name, genre_id, book_id):
 methods=['POST'])
 def editBook(super_category_name, genre_id, book_id):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    if(login_session['user_id']==thisBook.user_id): #verifies that the book belongs to the user who sent the POST request to change the description
+    #verifies that the book belongs to the user who sent the POST request
+    # to change the description
+    if(login_session['user_id']==thisBook.user_id):
         thisBook.description = request.form['updated_description']
         title = thisBook.title
         session.commit()
         flash(title + "'s description edited!")
-        return redirect(url_for('viewPage', API_KEY = CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
+        return redirect(url_for('viewPage', API_KEY = CustomSearchAPIKEY,
+            super_category_name=super_category_name,
+            genre_id=genre_id, book_id=book_id))
 
 # webpage that creates a new book
 @app.route('/newbook', methods=['GET', 'POST'])
@@ -480,9 +502,10 @@ def addBook():
         genre = request.form['genre']
         try:
             thisGenre=session.query(Genre).filter_by(name=genre).one()
-            # checks to see if book title and genre are duplicates, will not add
-            # them if they both are
-            if(not session.query(exists().where(BookItem.title==title).where(BookItem.genre_id==thisGenre.id)).scalar()):
+            # checks to see if book title and genre are duplicates, will
+            # not add them if they both are
+            if(not session.query(exists().where(BookItem.title==title).where(
+                BookItem.genre_id==thisGenre.id)).scalar()):
                 newBook = BookItem(title=title, author=[author],
                 description=desc,
                 genre=thisGenre, imgURL=None, user_id=thisGenre.user_id)
@@ -494,8 +517,9 @@ def addBook():
             else:
                 thisBook = session.query(BookItem).filter_by(title=title).one()
                 flash(thisBook.title + " already exists in your collection!")
-            return redirect(url_for('viewPage', super_category_name=thisGenre.super_category.name, genre_id=thisBook.genre_id,
-            book_id=thisBook.id))
+            return redirect(url_for('viewPage',
+                super_category_name=thisGenre.super_category.name,
+                genre_id=thisBook.genre_id, book_id=thisBook.id))
         except:
             allGenres = session.query(Genre).all()
             return render_template('new-book.html', allGenres=allGenres)
@@ -503,15 +527,22 @@ def addBook():
         allGenres = session.query(Genre).all()
         return render_template('new-book.html', allGenres=allGenres)
 
+
 # webpage that sets the imgURL property for a book so that a picture appears
 # on the book-viewer page
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
+@app.route('/<string:super_category_name>/<int:genre_id>/\
+        <int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
 def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    if(login_session['user_id']==thisBook.user_id and thisBook.imgURL==None): #verifies that the book belongs to the user who sent the POST request to set the image
+    #verifies that the book belongs to the user who sent the POST request
+    # to set the image
+    if(login_session['user_id']==thisBook.user_id and thisBook.imgURL==None):
         thisBook.imgURL = str(imgLocation)
         session.commit()
-        return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY, super_category_name=super_category_name, genre_id=genre_id, book_id=book_id))
+        return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY,
+            super_category_name=super_category_name,
+            genre_id=genre_id, book_id=book_id))
+
 
 # webpage that creates a new genre, with a form that uses POST to send the
 # server a genre name and super-category the user enters
@@ -523,8 +554,10 @@ def addGenre():
         name = request.form['name']
         superCategoryName = request.form['category']
         user_id = login_session['user_id']
-        superCategory = session.query(SuperCategory).filter_by(name=superCategoryName).one()
-        newGenre = Genre(name=name, super_category=superCategory, user_id=user_id)
+        superCategory = session.query(
+                SuperCategory).filter_by(name=superCategoryName).one()
+        newGenre = Genre(name=name,
+                super_category=superCategory, user_id=user_id)
         session.add(newGenre)
         session.commit()
         flash(newGenre.name + " genre added!")
@@ -532,18 +565,21 @@ def addGenre():
         return render_template('new-book.html', allGenres=allGenres)
     else:
         superCategories = session.query(SuperCategory).all()
-        return render_template('new-genre.html', allSuperCategories=superCategories)
+        return render_template('new-genre.html',
+                allSuperCategories=superCategories)
+
 
 # used to get the JSON info for a particular book
 @app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/JSON')
 def singleBookJSON(super_category_name, genre_id, book_id):
     try:
         book = session.query(BookItem).filter(
-            BookItem.genre_id == genre_id, BookItem.id==book_id).one()
+                BookItem.genre_id == genre_id, BookItem.id==book_id).one()
         genre = session.query(Genre).filter_by(id=genre_id).one()
         return jsonify(BookItems=[book.serialize])
     except:
         return "That genre id and/or book id could not be found!"
+
 
 # used to get the JSON info for an entire genre
 @app.route('/<string:super_category_name>/<int:genre_id>/JSON')
@@ -553,12 +589,16 @@ def genreBooksJSON(super_category_name, genre_id):
         genre_id=genre_id).all()
     return jsonify(BookItems=[i.serialize for i in items])
 
+
 # used to get the JSON info for an entire supercategory
 @app.route('/<string:super_category_name>/JSON/')
 def superCategoryJSON(super_category_name):
-    super_category = session.query(SuperCategory).filter_by(name=super_category_name).one()
-    genresInCategory = session.query(Genre).filter_by(super_category_id=super_category.id).all()
+    super_category = session.query(
+            SuperCategory).filter_by(name=super_category_name).one()
+    genresInCategory = session.query(
+            Genre).filter_by(super_category_id=super_category.id).all()
     return jsonify(Genre=[i.serialize for i in genresInCategory])
+
 
 if __name__ == '__main__':
     # secret key used here to enable flash messages

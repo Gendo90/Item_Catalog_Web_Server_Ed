@@ -4,7 +4,7 @@ from database_setup import Base, User, SuperCategory, Genre, BookItem
 
 engine = create_engine('sqlite:///booklistwithusers.db')
 Base.metadata.bind = engine
-DBSession = sessionmaker(bind = engine)
+DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
@@ -16,7 +16,7 @@ try:
         print(item.name)
         session.remove(item)
     session.commit()
-except:
+except KeyError:
     pass
 
 # add super-categories that contain the genres
@@ -31,11 +31,12 @@ session.add(SuperCategory_III)
 
 session.commit()
 
-#Add basic genres
+# Add basic genres
 Genre_I = Genre(name="Fantasy", super_category=SuperCategory_I, user_id=1)
 session.add(Genre_I)
 
-Genre_II = Genre(name="Science Fiction", super_category=SuperCategory_I, user_id=1)
+Genre_II = Genre(
+        name="Science Fiction", super_category=SuperCategory_I, user_id=1)
 session.add(Genre_II)
 
 Genre_III = Genre(name="Self-Help", super_category=SuperCategory_II, user_id=1)
@@ -45,40 +46,48 @@ Genre_IV = Genre(name="Law", super_category=SuperCategory_II, user_id=1)
 session.add(Genre_IV)
 
 
-#Add one book per genre to start!
-Book_I = BookItem(title="The Hobbit", author=["J.R.R. Tolkien"],
-description="A classic fantasy adventure masterpiece, which introduces \
-Middle-Earth to most readers, and serves as a prequel to Tolkien's Lord of the \
-Rings epic saga.", genre=Genre_I, imgURL='https://i.pinimg.com/236x/46/20/86/46208668db6465c78d5cdb774dfa0e69--hobbit-book-the-hobbit.jpg',
-user_id=1)
+# Add one book per genre to start!
+Book_I = BookItem(
+        title="The Hobbit", author=["J.R.R. Tolkien"],
+        description="A classic fantasy adventure masterpiece, which \
+        introduces Middle-Earth to most readers, and serves as a prequel to \
+        Tolkien's Lord of the Rings epic saga.", genre=Genre_I,
+        imgURL='https://i.pinimg.com/236x/\
+        46/20/86/46208668db6465c78d5cdb774dfa0e69\
+        --hobbit-book-the-hobbit.jpg', user_id=1)
 session.add(Book_I)
 
-Book_II = BookItem(title="Hyperion", author=["Dan Simmons"],
-description="A Hugo Award-winning science fiction novel, which details the \
-journey of a special force of 'pilgrims' to the planet Hyperion, who were \
-all connected to the planet in the past and are now tasked with unravelling \
-its secrets. Story is comprised of multiple narrative accounts of the 'pilgrims'\
-past connection to Hyperion, and is structured in the same way as the \
-Canterbury Tales - stories told on-route to their destination!",
-genre=Genre_II, imgURL=None, user_id=1)
+Book_II = BookItem(
+        title="Hyperion", author=["Dan Simmons"],
+        description="A Hugo Award-winning science fiction novel, which \
+        details the journey of a special force of 'pilgrims' to the planet \
+        Hyperion, who were all connected to the planet in the past and are \
+        now tasked with unravelling its secrets. Story is comprised of \
+        multiple narrative accounts of the 'pilgrims' past connection to \
+        Hyperion, and is structured in the same way as the Canterbury Tales - \
+        stories told on-route to their destination!",
+        genre=Genre_II, imgURL=None, user_id=1)
 session.add(Book_II)
 
-Book_III = BookItem(title="Willpower: Rediscovering the Greatest Human Strength",
- author=["Roy F. Baumeister", "John Tierney"], description="A book written by \
- a psychologist and a journalist examining the modern history and study of \
- the trait of 'willpower', and giving advice on how to use and improve it in \
- your daily life!",
-genre=Genre_III, imgURL=None, user_id=1)
+Book_III = BookItem(
+        title="Willpower: Rediscovering the Greatest Human \
+        Strength", author=["Roy F. Baumeister", "John Tierney"],
+        description="A book written by a psychologist and a journalist \
+        examining the modern history and study of the trait of 'willpower', \
+        and giving advice on how to use and improve it in your daily life!",
+        genre=Genre_III, imgURL=None, user_id=1)
 session.add(Book_III)
 
-Book_IV = BookItem(title="Law for Dummies",
- author=["John Ventura"], description="""A book written by
- a lawyer that explains the basics of different areas of the law, especially
- common occurences and legal tips that are directly applicable to the reader's
- life, like contracts and family law.""",
-genre=Genre_IV, imgURL=None, user_id=1)
+Book_IV = BookItem(
+        title="Law for Dummies", author=["John Ventura"],
+        description="""A book written by
+             a lawyer that explains the basics of different areas of the law, \
+             especially common occurrences and legal tips that are directly \
+             applicable to the reader's life, like contracts and family \
+             law.""",
+        genre=Genre_IV, imgURL=None, user_id=1)
 session.add(Book_IV)
 
 
-#Commit all changes made to booklist.db!
+# Commit all changes made to booklist.db!
 session.commit()

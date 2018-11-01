@@ -1,56 +1,55 @@
 import sys
 from sqlalchemy import Column, ForeignKey, Integer, String, PickleType
-#from sqlalchemy_imageattach.entity import Image, image_attachment
+# from sqlalchemy_imageattach.entity import Image, image_attachment
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'user'
 
     name = Column(
-    String(40), nullable = False)
+        String(40), nullable=False)
 
-    #picture = image_attachment('ProfilePicture')
     picture = Column(
-    String(250))
+        String(250))
 
     email = Column(
-    String(60), nullable = False)
+        String(60), nullable=False)
 
     id = Column(
-    Integer, primary_key = True)
+        Integer, primary_key=True)
 
-#class ProfilePicture(Base, Image):
-#    user_id =
 
 class SuperCategory(Base):
     __tablename__ = 'super_category'
 
     name = Column(
-    String(25), nullable = False)
+        String(25), nullable=False)
 
     id = Column(
-    Integer, primary_key = True)
+        Integer, primary_key=True)
+
 
 class Genre(Base):
     __tablename__ = 'genre'
 
     name = Column(
-    String(80), nullable = False)
+        String(80), nullable=False)
 
     id = Column(
-    Integer, primary_key = True)
+        Integer, primary_key=True)
 
     super_category_id = Column(
-    Integer, ForeignKey('super_category.id'), nullable = False)
+        Integer, ForeignKey('super_category.id'), nullable=False)
 
     super_category = relationship(SuperCategory)
 
     user_id = Column(
-    Integer, ForeignKey('user.id'), nullable = False)
+        Integer, ForeignKey('user.id'), nullable=False)
 
     user = relationship(User)
 
@@ -69,22 +68,22 @@ class Genre(Base):
 class BookItem(Base):
     __tablename__ = 'book_item'
 
-    id = Column(Integer, primary_key = True)
+    id = Column(Integer, primary_key=True)
 
-    title = Column(String(100), nullable = False)
+    title = Column(String(100), nullable=False)
 
-    author = Column(PickleType(), nullable=False)#String(100), nullable = False)
+    author = Column(PickleType(), nullable=False)
 
     description = Column(String(600))
 
     imgURL = Column(String(100))
 
-    genre_id = Column(Integer, ForeignKey('genre.id'), nullable = False)
+    genre_id = Column(Integer, ForeignKey('genre.id'), nullable=False)
 
     genre = relationship(Genre)
 
     user_id = Column(
-    Integer, ForeignKey('user.id'), nullable = False)
+        Integer, ForeignKey('user.id'), nullable=False)
 
     user = relationship(User)
 
@@ -103,10 +102,7 @@ class BookItem(Base):
         }
 
 
-
-#end of code!
-
 engine = create_engine(
-'sqlite:///booklistwithusers.db')
+        'sqlite:///booklistwithusers.db')
 
 Base.metadata.create_all(engine)
