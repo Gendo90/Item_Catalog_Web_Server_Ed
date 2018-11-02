@@ -410,7 +410,7 @@ def superCategoryMainPage(super_category_name):
 @app.route("/<string:super_category_name>/<string:genre_name>/")
 def listGenre(super_category_name, genre_name):
     genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).all()
-    print(genreBooks)
+    # print(genreBooks)
     # genre_id_list = session.query(genre).
     # genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
 
@@ -421,15 +421,18 @@ def listGenre(super_category_name, genre_name):
 
 
 # Book Viewer page for the website
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/view')
-def viewPage(super_category_name, genre_id, book_id):
+@app.route('/<string:super_category_name>/<string:genre_name>/<int:book_id>/view')
+def viewPage(super_category_name, genre_name, book_id):
     # ensures there is a login session user id to compare against
     try:
         login_session['user_id']
     except KeyError:
         login_session['user_id'] = -0.1
-    genre = session.query(Genre).filter_by(id=genre_id).one()
-    genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
+    # update this genre query so that it returns all books for the given
+    # genre, regardless of the user
+    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).all()
+    # genre = session.query(Genre).filter_by(id=genre_id).one()
+    # genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
     # code that determines if there are one or more authors for the book
     book = session.query(BookItem).filter_by(id=book_id).one()
     title = urllib.parse.quote(book.title)
@@ -440,13 +443,13 @@ def viewPage(super_category_name, genre_id, book_id):
             return render_template(
                 'book-viewer.html',
                 API_KEY=CustomSearchAPIKEY,
-                super_category_name=super_category_name, genre=genre,
+                super_category_name=super_category_name, genre=genre_name,
                 genreBooks=genreBooks, book=book, parse_title=title,
                 author=book.author[0])
         else:
             return render_template(
                 'book-viewer-logged-out.html',
-                super_category_name=super_category_name, genre=genre,
+                super_category_name=super_category_name, genre=genre_name,
                 genreBooks=genreBooks, book=book, parse_title=title,
                 author=book.author[0])
     else:
@@ -461,21 +464,21 @@ def viewPage(super_category_name, genre_id, book_id):
                 'book-viewer.html',
                 API_KEY=CustomSearchAPIKEY,
                 super_category_name=super_category_name,
-                genre=genre, genreBooks=genreBooks, book=book,
+                genre=genre_name, genreBooks=genreBooks, book=book,
                 parse_title=title, author=authors)
         else:
             return render_template(
                 'book-viewer-logged-out.html',
                 super_category_name=super_category_name,
-                genre=genre, genreBooks=genreBooks, book=book,
+                genre=genre_name, genreBooks=genreBooks, book=book,
                 parse_title=title, author=authors)
 
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
 @app.route(
-    '/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete',
+    '/<string:super_category_name>/<string:genre_name>/<int:book_id>/delete',
     methods=['POST'])
-def deleteBook(super_category_name, genre_id, book_id):
+def deleteBook(super_category_name, genre_name, book_id):
     thisBook = session.query(BookItem).filter_by(id=book_id).one()
     # verifies that the book belongs to the user who sent the POST request
     # to set the image
@@ -489,9 +492,9 @@ def deleteBook(super_category_name, genre_id, book_id):
 
 # inaccessible webpage (uses POST method only) that edits a book's description
 @app.route(
-    '/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit',
+    '/<string:super_category_name>/<string:genre_name>/<int:book_id>/edit',
     methods=['POST'])
-def editBook(super_category_name, genre_id, book_id):
+def editBook(super_category_name, genre_name, book_id):
     thisBook = session.query(BookItem).filter_by(id=book_id).one()
     # verifies that the book belongs to the user who sent the POST request
     # to change the description
@@ -503,7 +506,7 @@ def editBook(super_category_name, genre_id, book_id):
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
-            genre_id=genre_id, book_id=book_id))
+            genre_name=genre_name, book_id=book_id))
 
 
 # webpage that creates a new book
@@ -539,7 +542,7 @@ def addBook():
             return redirect(url_for(
                 'viewPage',
                 super_category_name=thisGenre.super_category.name,
-                genre_id=thisBook.genre_id, book_id=thisBook.id))
+                genre_name=genre, book_id=thisBook.id))
         else:
             allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
             return render_template('new-book.html', allGenres=allMyGenres)
@@ -550,10 +553,10 @@ def addBook():
 # webpage that sets the imgURL property for a book so that a picture appears
 # on the book-viewer page
 @app.route(
-        '/<string:super_category_name>/<int:genre_id>/\
+        '/<string:super_category_name>/<string:genre_name>/\
         <int:book_id>/cover_pic/<path:imgLocation>'.replace(" ", ""),
         methods=['POST'])
-def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
+def setCoverImg(super_category_name, genre_name, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id=book_id).one()
     # verifies that the book belongs to the user who sent the POST request
     # to set the image
@@ -564,7 +567,7 @@ def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
-            genre_id=genre_id, book_id=book_id))
+            genre_name=genre_name, book_id=book_id))
 
 
 # webpage that creates a new genre, with a form that uses POST to send the
