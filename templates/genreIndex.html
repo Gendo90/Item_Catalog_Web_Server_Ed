@@ -27,7 +27,10 @@
     <div class=sidebar>
       <h2>{{superCategory}}</h2>
       <div class=sidebar_line></div>
+
+      {% if session['email'] %}
       <div class=add_book><a href='{{url_for('addGenre')}}'><button class="new_book" type=button>Add Another Genre!</button></a></div>
+      {% endif %}
                                       {% for genre in genres %}
         <div class=sidebar_links>
           <h3>
