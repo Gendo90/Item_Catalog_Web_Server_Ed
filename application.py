@@ -525,19 +525,22 @@ def addBook():
             # not add them if they both are
             if(not session.query(exists().where(
                     BookItem.title == title).where(
-                    BookItem.genre_id == thisGenre.id)).scalar()):
+                    BookItem.user_id == thisGenre.user_id)).scalar()):
                     newBook = BookItem(
                         title=title, author=[author], description=desc,
                         genre=thisGenre, imgURL=None,
                         user_id=thisGenre.user_id)
                     session.add(newBook)
                     session.commit()
-                    thisBook = session.query(BookItem).filter_by(
-                            title=title).one()
+                    thisBook = session.query(BookItem).filter(
+                            BookItem.title==title,
+                            BookItem.user_id==user_id).one()
                     print(thisBook.title)
                     flash(thisBook.title + " added!")
             else:
-                thisBook = session.query(BookItem).filter_by(title=title).one()
+                thisBook = session.query(BookItem).filter(
+                BookItem.title==title,
+                BookItem.genre_id==thisGenre.id).one()
                 flash(thisBook.title + " already exists in your collection!")
             return redirect(url_for(
                 'viewPage',
