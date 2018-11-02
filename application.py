@@ -388,8 +388,11 @@ def superCategoryMainPage(super_category_name):
     thisCategory = session.query(
             SuperCategory).filter_by(name=super_category_name).one()
     try:
+        # modified so that it only shows one genre if there are multiple with
+        # the same name (e.g. two different "Fantasy" genres for different
+        # user id's will only show once)
         containedGenres = session.query(
-                Genre).filter_by(super_category_id=thisCategory.id).all()
+                Genre).filter_by(super_category_id=thisCategory.id).from_self().group_by(Genre.name).all()
 
         return render_template(
             'genreIndex.html',
