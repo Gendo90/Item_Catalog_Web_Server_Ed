@@ -538,8 +538,10 @@ def addBook():
 
 # webpage that sets the imgURL property for a book so that a picture appears
 # on the book-viewer page
-@app.route('/<string:super_category_name>/<int:genre_id>/\
-        <int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
+@app.route(
+        '/<string:super_category_name>/<int:genre_id>/\
+        <int:book_id>/cover_pic/<path:imgLocation>'.replace(" ", ""),
+        methods=['POST'])
 def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
     thisBook = session.query(BookItem).filter_by(id=book_id).one()
     # verifies that the book belongs to the user who sent the POST request
