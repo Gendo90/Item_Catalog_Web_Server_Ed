@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from flask import Flask, render_template, url_for, redirect, jsonify, flash
+from flask import request
 
 from sqlalchemy import create_engine, exists
 from sqlalchemy.orm import sessionmaker, exc
@@ -233,7 +234,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     elif (json.loads(result2)["error_description"] ==
-                    "Token expired or revoked"):
+            "Token expired or revoked"):
         # user_id field is always an integer as defined in the User class, so
         # if there is no user currently logged-in to the site, setting the
         # user_id to a fraction here signifies that no valid user is
@@ -264,13 +265,13 @@ def fbconnect():
     app_secret = json.loads(
         open('fb_client_secrets.json', 'r').read())['web']['app_secret']
     url = 'https://graph.facebook.com/oauth/access_token?\
-            grant_type=fb_exchange_token&client_id=%s&client_secret=%s&\
-            fb_exchange_token=%s' % (
+            grant_type=fb_exchange_token&client_id={}&client_secret={}&\
+            fb_exchange_token={}'.format(
         app_id, app_secret, access_token.decode('utf-8'))  # access token must
     # be decoded here because it is in bytes not string
-    print(url)
+    print(url.replace(" ", ""))
     h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
+    result = h.request(url.replace(" ", ""), 'GET')[1]
     # Use token to get user info from API
     userinfo_url = "https://graph.facebook.com/v3.2/me"
     '''
@@ -283,13 +284,13 @@ def fbconnect():
     '''
     print(result)
     # result must be decoded because it is in bytes not string
-    token = result.decode("utf-8").split(
-            ',')[0].split(':')[1].replace('"', '')
+    token = result.decode("utf-8").split(',')[0].split(':')[1].replace('"', '')
 
-    url = 'https://graph.facebook.com/v3.2/me?access_token=%s&\
-            fields=name,id,email' % token
+    url = 'https://graph.facebook.com/v3.2/\
+    me?access_token=%s&fields=name,id,email' % token
+    print(url.replace(" ", ""))
     h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
+    result = h.request(url.replace(" ", ""), 'GET')[1]
     data = json.loads(result)
     login_session['provider'] = 'facebook'
     login_session['username'] = data["name"]
@@ -303,7 +304,7 @@ def fbconnect():
     url = 'https://graph.facebook.com/v3.2/me/picture?\
             access_token=%s&redirect=0&height=200&width=200' % token
     h = httplib2.Http()
-    result = h.request(url, 'GET')[1]
+    result = h.request(url.replace(" ", ""), 'GET')[1]
     data = json.loads(result)
 
     login_session['picture'] = data["data"]["url"]
@@ -329,20 +330,21 @@ def fbconnect():
     flash("Now logged in as %s" % login_session['username'])
     return output
 
+
 @app.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must be included to successfully logout
     access_token = login_session['access_token']
     url = 'https://graph.facebook.com/%s/permissions?\
-            access_token=%s' % (facebook_id,access_token)
+            access_token=%s' % (facebook_id, access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
 
 
- # Disconnect based on provider - will disconnect for both Google and Facebook
- # OAuth sessions presently
+# Disconnect based on provider - will disconnect for both Google and Facebook
+# OAuth sessions presently
 @app.route('/disconnect')
 def disconnect():
     if 'provider' in login_session:
@@ -360,8 +362,9 @@ def disconnect():
         user_Genres = session.query(Genre).filter_by(user_id=user_id).all()
         for genre in user_Genres:
             user_Books = session.query(BookItem).filter(
-                BookItem.user_id==user_id, BookItem.genre_id==genre.id).all()
-            if user_Books==[]:
+                BookItem.user_id == user_id,
+                BookItem.genre_id == genre.id).all()
+            if user_Books == []:
                 print("Removing '" + genre.name + "' user's genres!")
                 session.delete(genre)
                 session.commit()
@@ -376,6 +379,7 @@ def disconnect():
         flash("You were not logged in")
         return redirect(url_for('mainPage'))
 
+
 # Three super-categories that link to different pages - the string name should
 # be "Fiction", "Non-Fiction", or "Reference" to get valid results for the
 # genres in those super-categories
@@ -387,22 +391,27 @@ def superCategoryMainPage(super_category_name):
         containedGenres = session.query(
                 Genre).filter_by(super_category_id=thisCategory.id).all()
 
-        return render_template('genreIndex.html',
-                superCategory=thisCategory.name, genres=containedGenres)
-    except: # case where there are no genres or books for this user yet - like
-            # a new user!
-        return render_template('genreIndex.html',
-                superCategory=thisCategory.name, genres=[])
+        return render_template(
+            'genreIndex.html',
+            superCategory=thisCategory.name, genres=containedGenres)
+    except exc.NoResultFound:
+        # case where there are no genres or books for this user yet - like
+        # a new user!
+        return render_template(
+            'genreIndex.html',
+            superCategory=thisCategory.name, genres=[])
+
 
 # webpage listing books within a particular genre
 @app.route("/<string:super_category_name>/<int:genre_id>/")
 def listGenre(super_category_name, genre_id):
-    genre = session.query(Genre).filter_by(id = genre_id).one()
-    genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
+    genre = session.query(Genre).filter_by(id=genre_id).one()
+    genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
 
-    return render_template('genre-list.html',
-            super_category_name=super_category_name, genre=genre,
-            bookList=genreBooks) # NEED TO SHOW BOOKS IN GENRE HERE?
+    return render_template(
+        'genre-list.html',
+        super_category_name=super_category_name, genre=genre,
+        bookList=genreBooks)  # NEED TO SHOW BOOKS IN GENRE HERE?
 
 
 # Book Viewer page for the website
@@ -411,118 +420,117 @@ def viewPage(super_category_name, genre_id, book_id):
     # ensures there is a login session user id to compare against
     try:
         login_session['user_id']
-    except:
+    except KeyError:
         login_session['user_id'] = -0.1
-    genre = session.query(Genre).filter_by(id = genre_id).one()
-    genreBooks = session.query(BookItem).filter_by(genre_id = genre.id).all()
-    try:
-        book = session.query(BookItem).filter_by(id = book_id).one()
-        title = urllib.parse.quote(book.title)
-        if len(book.author)==1:
-            # makes sure the page only loads the edit and delete info if the
-            # user is logged in and it is their book!
-            if(login_session['user_id']==book.user_id):
-                return render_template('book-viewer.html',
+    genre = session.query(Genre).filter_by(id=genre_id).one()
+    genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
+    # code that determines if there are one or more authors for the book
+    book = session.query(BookItem).filter_by(id=book_id).one()
+    title = urllib.parse.quote(book.title)
+    if len(book.author) == 1:
+        # makes sure the page only loads the edit and delete info if the
+        # user is logged in and it is their book!
+        if(login_session['user_id'] == book.user_id):
+            return render_template(
+                'book-viewer.html',
                 API_KEY=CustomSearchAPIKEY,
                 super_category_name=super_category_name, genre=genre,
-                genreBooks=genreBooks, book = book, parse_title = title,
-                author=book.author[0])
-            else:
-                return render_template('book-viewer-logged-out.html',
-                super_category_name=super_category_name, genre=genre,
-                genreBooks=genreBooks, book = book, parse_title = title,
+                genreBooks=genreBooks, book=book, parse_title=title,
                 author=book.author[0])
         else:
-            authors = ""
-            for author in book.author:
-                authors += author + ", "
-            authors = authors[:len(authors)-2]
-            # makes sure the page only loads the edit and delete info if the
-            # user is logged in and it is their book!
-            if(login_session['user_id']==book.user_id):
-                return render_template('book-viewer.html',
-                    API_KEY=CustomSearchAPIKEY,
-                    super_category_name=super_category_name,
-                    genre=genre, genreBooks=genreBooks, book = book,
-                    parse_title = title, author = authors)
-            else:
-                return render_template('book-viewer-logged-out.html',
-                    super_category_name=super_category_name,
-                    genre=genre, genreBooks=genreBooks, book = book,
-                    parse_title = title, author = authors)
+            return render_template(
+                'book-viewer-logged-out.html',
+                super_category_name=super_category_name, genre=genre,
+                genreBooks=genreBooks, book=book, parse_title=title,
+                author=book.author[0])
+    else:
+        authors = ""
+        for author in book.author:
+            authors += author + ", "
+        authors = authors[:len(authors)-2]
+        # makes sure the page only loads the edit and delete info if the
+        # user is logged in and it is their book!
+        if(login_session['user_id'] == book.user_id):
+            return render_template(
+                'book-viewer.html',
+                API_KEY=CustomSearchAPIKEY,
+                super_category_name=super_category_name,
+                genre=genre, genreBooks=genreBooks, book=book,
+                parse_title=title, author=authors)
+        else:
+            return render_template(
+                'book-viewer-logged-out.html',
+                super_category_name=super_category_name,
+                genre=genre, genreBooks=genreBooks, book=book,
+                parse_title=title, author=authors)
 
-    except: # debug code to see what is in the database (genre and book IDs)
-        genres = session.query(Genre).all()
-        outputI = "Genre IDs:"
-        for i in genres:
-            outputI += " " + str(i.id) + "    "
-        books = session.query(BookItem).all()
-        outputII = "Book IDs:"
-        for n in books:
-            outputII += " " + str(n.id) + "    "
-        return outputI + outputII
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete',
-methods=['POST'])
+@app.route(
+    '/<string:super_category_name>/<int:genre_id>/<int:book_id>/delete',
+    methods=['POST'])
 def deleteBook(super_category_name, genre_id, book_id):
-    thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    #verifies that the book belongs to the user who sent the POST request
+    thisBook = session.query(BookItem).filter_by(id=book_id).one()
+    # verifies that the book belongs to the user who sent the POST request
     # to set the image
-    if(login_session['user_id']==thisBook.user_id):
+    if(login_session['user_id'] == thisBook.user_id):
         title = thisBook.title
         session.delete(thisBook)
         session.commit()
         flash(title + " removed!")
         return render_template('index-logged-in.html')
 
+
 # inaccessible webpage (uses POST method only) that edits a book's description
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit',
-methods=['POST'])
+@app.route(
+    '/<string:super_category_name>/<int:genre_id>/<int:book_id>/edit',
+    methods=['POST'])
 def editBook(super_category_name, genre_id, book_id):
-    thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    #verifies that the book belongs to the user who sent the POST request
+    thisBook = session.query(BookItem).filter_by(id=book_id).one()
+    # verifies that the book belongs to the user who sent the POST request
     # to change the description
-    if(login_session['user_id']==thisBook.user_id):
+    if(login_session['user_id'] == thisBook.user_id):
         thisBook.description = request.form['updated_description']
         title = thisBook.title
         session.commit()
         flash(title + "'s description edited!")
-        return redirect(url_for('viewPage', API_KEY = CustomSearchAPIKEY,
+        return redirect(url_for(
+            'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
             genre_id=genre_id, book_id=book_id))
+
 
 # webpage that creates a new book
 @app.route('/newbook', methods=['GET', 'POST'])
 def addBook():
-    if(request.method=='POST'):
+    if(request.method == 'POST'):
         title = request.form['title']
         author = request.form['author']
         desc = request.form['description']
         genre = request.form['genre']
-        try:
-            thisGenre=session.query(Genre).filter_by(name=genre).one()
-            # checks to see if book title and genre are duplicates, will
-            # not add them if they both are
-            if(not session.query(exists().where(BookItem.title==title).where(
-                BookItem.genre_id==thisGenre.id)).scalar()):
-                newBook = BookItem(title=title, author=[author],
-                description=desc,
-                genre=thisGenre, imgURL=None, user_id=thisGenre.user_id)
+        thisGenre = session.query(Genre).filter_by(name=genre).one()
+        # checks to see if book title and genre are duplicates, will
+        # not add them if they both are
+        if(not session.query(exists().where(
+                BookItem.title == title).where(
+                BookItem.genre_id == thisGenre.id)).scalar()):
+                newBook = BookItem(
+                    title=title, author=[author], description=desc,
+                    genre=thisGenre, imgURL=None,
+                    user_id=thisGenre.user_id)
                 session.add(newBook)
                 session.commit()
-                thisBook = session.query(BookItem).filter_by(title=title).one()
+                thisBook = session.query(BookItem).filter_by(
+                        title=title).one()
                 print(thisBook.title)
                 flash(thisBook.title + " added!")
-            else:
-                thisBook = session.query(BookItem).filter_by(title=title).one()
-                flash(thisBook.title + " already exists in your collection!")
-            return redirect(url_for('viewPage',
-                super_category_name=thisGenre.super_category.name,
-                genre_id=thisBook.genre_id, book_id=thisBook.id))
-        except:
-            allGenres = session.query(Genre).all()
-            return render_template('new-book.html', allGenres=allGenres)
+        else:
+            thisBook = session.query(BookItem).filter_by(title=title).one()
+            flash(thisBook.title + " already exists in your collection!")
+        return redirect(url_for(
+            'viewPage',
+            super_category_name=thisGenre.super_category.name,
+            genre_id=thisBook.genre_id, book_id=thisBook.id))
     else:
         allGenres = session.query(Genre).all()
         return render_template('new-book.html', allGenres=allGenres)
