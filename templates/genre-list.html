@@ -36,7 +36,9 @@
     <div class=sidebar>
       <h2>{{genre.name}}</h2>
       <div class=sidebar_line></div>
+      {% if session['email'] %}
       <div class=add_book><a href='{{url_for('addBook')}}'><button class="new_book" type=button>Add Another Book!</button></a></div>
+      {% endif %}
                                       {% for book in bookList %}
         <div class=sidebar_links>
           <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_id=book.genre_id, book_id=book.id)}}>{{book.title}}</a></h3>
