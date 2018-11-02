@@ -402,15 +402,18 @@ def superCategoryMainPage(super_category_name):
             superCategory=thisCategory.name, genres=[])
 
 
-# webpage listing books within a particular genre
-@app.route("/<string:super_category_name>/<int:genre_id>/")
-def listGenre(super_category_name, genre_id):
-    genre = session.query(Genre).filter_by(id=genre_id).one()
-    genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
+# webpage listing books within a particular genre - for ALL users with that
+# genre!
+@app.route("/<string:super_category_name>/<string:genre_name>/")
+def listGenre(super_category_name, genre_name):
+    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).all()
+    print(genreBooks)
+    # genre_id_list = session.query(genre).
+    # genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
 
     return render_template(
         'genre-list.html',
-        super_category_name=super_category_name, genre=genre,
+        super_category_name=super_category_name, genre=genre_name,
         bookList=genreBooks)  # NEED TO SHOW BOOKS IN GENRE HERE?
 
 
@@ -503,37 +506,42 @@ def editBook(super_category_name, genre_id, book_id):
 # webpage that creates a new book
 @app.route('/newbook', methods=['GET', 'POST'])
 def addBook():
-    if(request.method == 'POST'):
-        title = request.form['title']
-        author = request.form['author']
-        desc = request.form['description']
-        genre = request.form['genre']
-        thisGenre = session.query(Genre).filter_by(name=genre).one()
-        # checks to see if book title and genre are duplicates, will
-        # not add them if they both are
-        if(not session.query(exists().where(
-                BookItem.title == title).where(
-                BookItem.genre_id == thisGenre.id)).scalar()):
-                newBook = BookItem(
-                    title=title, author=[author], description=desc,
-                    genre=thisGenre, imgURL=None,
-                    user_id=thisGenre.user_id)
-                session.add(newBook)
-                session.commit()
-                thisBook = session.query(BookItem).filter_by(
-                        title=title).one()
-                print(thisBook.title)
-                flash(thisBook.title + " added!")
+    try:
+        user_id = login_session["user_id"]
+        if(request.method == 'POST'):
+            title = request.form['title']
+            author = request.form['author']
+            desc = request.form['description']
+            genre = request.form['genre']
+            thisGenre = session.query(Genre).filter(
+                Genre.name==genre, Genre.user_id==user_id).one()
+            # checks to see if book title and genre are duplicates, will
+            # not add them if they both are
+            if(not session.query(exists().where(
+                    BookItem.title == title).where(
+                    BookItem.genre_id == thisGenre.id)).scalar()):
+                    newBook = BookItem(
+                        title=title, author=[author], description=desc,
+                        genre=thisGenre, imgURL=None,
+                        user_id=thisGenre.user_id)
+                    session.add(newBook)
+                    session.commit()
+                    thisBook = session.query(BookItem).filter_by(
+                            title=title).one()
+                    print(thisBook.title)
+                    flash(thisBook.title + " added!")
+            else:
+                thisBook = session.query(BookItem).filter_by(title=title).one()
+                flash(thisBook.title + " already exists in your collection!")
+            return redirect(url_for(
+                'viewPage',
+                super_category_name=thisGenre.super_category.name,
+                genre_id=thisBook.genre_id, book_id=thisBook.id))
         else:
-            thisBook = session.query(BookItem).filter_by(title=title).one()
-            flash(thisBook.title + " already exists in your collection!")
-        return redirect(url_for(
-            'viewPage',
-            super_category_name=thisGenre.super_category.name,
-            genre_id=thisBook.genre_id, book_id=thisBook.id))
-    else:
-        allGenres = session.query(Genre).all()
-        return render_template('new-book.html', allGenres=allGenres)
+            allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
+            return render_template('new-book.html', allGenres=allMyGenres)
+    except KeyError:
+        return redirect(url_for('loginPage'))
 
 
 # webpage that sets the imgURL property for a book so that a picture appears
@@ -574,8 +582,8 @@ def addGenre():
         session.add(newGenre)
         session.commit()
         flash(newGenre.name + " genre added!")
-        allGenres = session.query(Genre).all()
-        return render_template('new-book.html', allGenres=allGenres)
+        allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
+        return render_template('new-book.html', allGenres=allMyGenres)
     else:
         superCategories = session.query(SuperCategory).all()
         return render_template(

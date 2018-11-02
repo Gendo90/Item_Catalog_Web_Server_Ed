@@ -40,7 +40,7 @@ works properly. You can learn more about this requirement in Flask
 After running the `python application.py` command, you should be able to access
 the website application at the "localhost:8000" address in a browser. Login is
 required for adding, editing, or deleting books or genres and each user can
-only access their own books that they have entered at this time after logging
+only change their own books that they have entered at this time after logging
 in to their account. Users currently have two options for logging into the
 website, because they can verify their identities and get access to their
 account using either their Google or Facebook login credentials.
@@ -63,6 +63,22 @@ header will be replaced with a "Logout" button.
 
 #### Add A Genre
 
+Users who are logged in can add genres to the website, and will be able to view
+their own genres and other users' genres. The buttons to add new genres are
+located near the top of the sidebar on the "genreIndex.html" webpage, and also
+on the "new-book.html" webpage so that a user can easily add a new genre before
+adding a book to that genre, since the genre must exist before a book of that
+genre may be added.
+
+Genres are removed when they are empty and upon the user who deleted the last
+books in the genre logging out - that is, if all books in a particular genre
+have been deleted by the user, and they were the last remaining books in that
+genre so that it is now empty, the genre will be removed from the database
+when the user decides to log out. This deletion upon logout means that a user
+can add books to empty genres after newly creating a genre, and that they could
+add different books to genres that they removed all the books from in the same
+login session, so it adds flexibility to the user experience while also
+streamlining CRUD operations.
 
 #### Add A Book
 
@@ -103,6 +119,10 @@ A planned, upcoming feature is the ability to view random selections of other
 users' books, based on genre names that match genres in your personal
 collection, as well as some random books that will be featured on the public
 area of the website for any site visitors.
+
+Soon you will be able to view books and genres **only** in your collection and
+nothing from any other user's collection by following a "My Collection" link
+when logged in!
 
 Another planned upgrade would allow more books to be added each day, while
 enabling a revenue stream as an Amazon Associate. This upgrade consists of

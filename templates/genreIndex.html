@@ -34,7 +34,7 @@
                                       {% for genre in genres %}
         <div class=sidebar_links>
           <h3>
-          <a href={{url_for('listGenre', super_category_name=superCategory, genre_id=genre.id)}}>{{genre.name}}</a></h3>
+          <a href={{url_for('listGenre', super_category_name=superCategory, genre_name=genre.name)}}>{{genre.name}}</a></h3>
           <br />
         </div>
                                       {% endfor %}

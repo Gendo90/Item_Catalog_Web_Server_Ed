@@ -34,7 +34,7 @@
 
   <div class=main_container>
     <div class=sidebar>
-      <h2>{{genre.name}}</h2>
+      <h2>{{genre}}</h2>
       <div class=sidebar_line></div>
       {% if session['email'] %}
       <div class=add_book><a href='{{url_for('addBook')}}'><button class="new_book" type=button>Add Another Book!</button></a></div>
