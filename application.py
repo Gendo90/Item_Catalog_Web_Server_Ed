@@ -541,13 +541,15 @@ def addBook():
 @app.route('/<string:super_category_name>/<int:genre_id>/\
         <int:book_id>/cover_pic/<path:imgLocation>', methods=['POST'])
 def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
-    thisBook = session.query(BookItem).filter_by(id = book_id).one()
-    #verifies that the book belongs to the user who sent the POST request
+    thisBook = session.query(BookItem).filter_by(id=book_id).one()
+    # verifies that the book belongs to the user who sent the POST request
     # to set the image
-    if(login_session['user_id']==thisBook.user_id and thisBook.imgURL==None):
+    if(login_session['user_id'] == thisBook.user_id and
+            thisBook.imgURL is None):
         thisBook.imgURL = str(imgLocation)
         session.commit()
-        return redirect(url_for('viewPage', API_KEY=CustomSearchAPIKEY,
+        return redirect(url_for(
+            'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
             genre_id=genre_id, book_id=book_id))
 
@@ -558,14 +560,15 @@ def setCoverImg(super_category_name, genre_id, book_id, imgLocation):
 # genre before adding a book to it!
 @app.route('/newgenre', methods=['GET', 'POST'])
 def addGenre():
-    if(request.method=='POST'):
+    if(request.method == 'POST'):
         name = request.form['name']
         superCategoryName = request.form['category']
         user_id = login_session['user_id']
         superCategory = session.query(
                 SuperCategory).filter_by(name=superCategoryName).one()
-        newGenre = Genre(name=name,
-                super_category=superCategory, user_id=user_id)
+        newGenre = Genre(
+                    name=name,
+                    super_category=superCategory, user_id=user_id)
         session.add(newGenre)
         session.commit()
         flash(newGenre.name + " genre added!")
@@ -573,8 +576,9 @@ def addGenre():
         return render_template('new-book.html', allGenres=allGenres)
     else:
         superCategories = session.query(SuperCategory).all()
-        return render_template('new-genre.html',
-                allSuperCategories=superCategories)
+        return render_template(
+                    'new-genre.html',
+                    allSuperCategories=superCategories)
 
 
 # used to get the JSON info for a particular book
@@ -582,10 +586,10 @@ def addGenre():
 def singleBookJSON(super_category_name, genre_id, book_id):
     try:
         book = session.query(BookItem).filter(
-                BookItem.genre_id == genre_id, BookItem.id==book_id).one()
+                BookItem.genre_id == genre_id, BookItem.id == book_id).one()
         genre = session.query(Genre).filter_by(id=genre_id).one()
         return jsonify(BookItems=[book.serialize])
-    except:
+    except exc.NoResultFound:
         return "That genre id and/or book id could not be found!"
 
 
