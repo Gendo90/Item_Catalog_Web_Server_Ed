@@ -28,7 +28,9 @@
         <p>A place to review great reads, as suggested by users like you!</p>
       </div>
     </div>
-
+    <div class=loggedinheading>
+      <a href="{{url_for('disconnect')}}"><button class=header_btn type=button>Logout</button></a>
+    </div>
   </div>
 
   {% with messages = get_flashed_messages() %}
