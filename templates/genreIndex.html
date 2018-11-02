@@ -16,9 +16,22 @@
   <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet" type='text/css'>
 </head>
 <body>
-  <div class=heading>
-    <h1>Best Books!</h1>
-    <p>A place to review great reads, as suggested by users like you!</p>
+  <div class=container>
+    <div class=loggedinheading>
+      <!--GHOST DIV FOR SPACING SO HEADER IS CENTERED!-->
+      <p class=text_blend> Login </p>
+    </div>
+    <div class=origheading>
+      <h1>Best Books!</h1>
+      <p>A place to review great reads, as suggested by users like you!</p>
+    </div>
+    <div class=loggedinheading>
+      {% if session['email'] %}
+      <a href="{{url_for('disconnect')}}"><button class=header_btn type=button>Logout</button></a>
+      {% else %}
+      <a href="{{url_for('loginPage')}}"><button class=header_btn type=button>Login</button></a>
+      {% endif %}
+    </div>
   </div>
 
 
