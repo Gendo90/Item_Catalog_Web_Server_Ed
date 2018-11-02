@@ -27,6 +27,7 @@
     <div class=sidebar>
       <h2>{{superCategory}}</h2>
       <div class=sidebar_line></div>
+      <div class=add_book><a href='{{url_for('addGenre')}}'><button class="new_book" type=button>Add Another Genre!</button></a></div>
                                       {% for genre in genres %}
         <div class=sidebar_links>
           <h3>

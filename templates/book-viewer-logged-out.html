@@ -30,7 +30,11 @@
     </div>
 
     <div class=loggedinheading>
+      {% if session['email'] %}
+      <a href="{{url_for('disconnect')}}"><button class=header_btn type=button>Logout</button></a>
+      {% else %}
       <a href="{{url_for('loginPage')}}"><button class=header_btn type=button>Login</button></a>
+      {% endif %}
     </div>
   </div>
 
