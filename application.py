@@ -3,7 +3,7 @@ from flask import Flask, render_template, url_for, redirect, jsonify, flash
 from flask import request
 
 from sqlalchemy import create_engine, exists
-from sqlalchemy.orm import sessionmaker, exc
+from sqlalchemy.orm import sessionmaker, exc, aliased
 from database_setup import Base, User, SuperCategory, Genre, BookItem
 
 # import packages for anti-forgery state token creation
@@ -409,7 +409,9 @@ def superCategoryMainPage(super_category_name):
 # genre!
 @app.route("/<string:super_category_name>/<string:genre_name>/")
 def listGenre(super_category_name, genre_name):
-    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).all()
+    #book_alias1 = aliased(BookItem)
+    #book_alias2 = aliased(BookItem)
+    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).group_by(BookItem.title)
     # print(genreBooks)
     # genre_id_list = session.query(genre).
     # genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
@@ -428,11 +430,15 @@ def viewPage(super_category_name, genre_name, book_id):
         login_session['user_id']
     except KeyError:
         login_session['user_id'] = -0.1
+    # new plan - get duplicate book titles first, then check book titles vs duplicate book
+    # titles, then remove duplicate book titles
     # update this genre query so that it returns all books for the given
     # genre, regardless of the user
-    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).all()
-    # genre = session.query(Genre).filter_by(id=genre_id).one()
-    # genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
+    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).group_by(BookItem.title)
+    print(genreBooks)
+    # find duplicate book entries to set up the link to the duplicate page!
+    # DOES NOT WORK YET!
+    duplicateBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).group_by(BookItem.title)
     # code that determines if there are one or more authors for the book
     book = session.query(BookItem).filter_by(id=book_id).one()
     title = urllib.parse.quote(book.title)
@@ -473,6 +479,12 @@ def viewPage(super_category_name, genre_name, book_id):
                 genre=genre_name, genreBooks=genreBooks, book=book,
                 parse_title=title, author=authors)
 
+# Viewer for duplicate books on the website
+@app.route('/<string:super_category_name>/<string:genre_name>/<int:book_id>/view/duplicates')
+def duplicateBookViewer(super_category_name, genre_name, book_id):
+    book = session.query(BookItem).filter_by(id=book_id).one()
+    bookCopies = session.query(BookItem).filter_by(title=book.title).all()
+    return render_template('duplicate-books.html', book=book.title, bookCopies=bookCopies, genre=genre_name)
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
 @app.route(
