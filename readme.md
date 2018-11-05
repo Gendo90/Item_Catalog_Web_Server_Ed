@@ -82,10 +82,22 @@ streamlining CRUD operations.
 
 #### Add A Book
 
+A user may add a book to their collection when logged into the website. They
+can add a book by entering its title, author(s), genre, and description into
+the form on the "new-book.html" webpage, which also has a path defined by the
+Flask decorator as "/newbook" After adding a book, the website notifies the
+user that a book has been successfully added using a "flash" message and
+redirects to the page on which to view the book.
 
 #### Logout
 
-
+Logout is one of the easiest actions to take using this app - a user who is
+already logged in just clicks on the "Logout" button at the right end of the
+website header, and the website will log the user out from their session on
+this website. Just as a reminder, the website uses Google and Facebook
+accounts for authorization, so they would need to log back in using one of
+these providers if they want to add, edit, or delete their books on the
+website again.
 
 ##---copied from earlier, full-stack project for structure/formatting!---
 
