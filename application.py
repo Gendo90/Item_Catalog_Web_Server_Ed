@@ -440,17 +440,12 @@ def viewPage(super_category_name, genre_name, book_id):
     # DOES NOT WORK YET!
     book = session.query(BookItem).filter_by(id=book_id).one()
     duplicateBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name, BookItem.title==book.title).count()
-    isDuplicate = False
     if(duplicateBooks>1):
         isDuplicate = True
-        if len(book.author) == 1:
-            return redirect(url_for(
+        return redirect(url_for(
             'duplicateBookViewer', super_category_name=super_category_name,
             genre_name=genre_name, book_id=book_id))
-    else:
-        isDuplicate = False
     # code that determines if there are one or more authors for the book
-    title = urllib.parse.quote(book.title)
     if len(book.author) == 1:
         # makes sure the page only loads the edit and delete info if the
         # user is logged in and it is their book!
@@ -459,13 +454,13 @@ def viewPage(super_category_name, genre_name, book_id):
                 'book-viewer.html',
                 API_KEY=CustomSearchAPIKEY,
                 super_category_name=super_category_name, genre=genre_name,
-                genreBooks=genreBooks, book=book, parse_title=title,
+                genreBooks=genreBooks, book=book,
                 author=book.author[0])
         else:
             return render_template(
                 'book-viewer-logged-out.html',
                 super_category_name=super_category_name, genre=genre_name,
-                genreBooks=genreBooks, book=book, parse_title=title,
+                genreBooks=genreBooks, book=book,
                 author=book.author[0])
     else:
         authors = ""
@@ -480,23 +475,47 @@ def viewPage(super_category_name, genre_name, book_id):
                 API_KEY=CustomSearchAPIKEY,
                 super_category_name=super_category_name,
                 genre=genre_name, genreBooks=genreBooks, book=book,
-                parse_title=title, author=authors)
+                author=authors)
         else:
             return render_template(
                 'book-viewer-logged-out.html',
                 super_category_name=super_category_name,
                 genre=genre_name, genreBooks=genreBooks, book=book,
-                parse_title=title, author=authors)
+                author=authors)
 
 # Viewer for duplicate books on the website
 @app.route('/<string:super_category_name>/<string:genre_name>/<int:book_id>/view/duplicates')
 def duplicateBookViewer(super_category_name, genre_name, book_id):
     book = session.query(BookItem).filter_by(id=book_id).one()
     bookCopies = session.query(BookItem).filter_by(title=book.title).all()
-    if(login_session['user_id'] == book.user_id):
-        return render_template('duplicate-books.html', super_category_name=super_category_name, book=book, bookCopies=bookCopies, genre=genre_name, API_KEY=CustomSearchAPIKEY)
+    if len(book.author) == 1:
+        if(login_session['user_id'] == book.user_id):
+            return render_template(
+            'duplicate-books.html', super_category_name=super_category_name,
+            book=book, bookCopies=bookCopies, genre=genre_name,
+            API_KEY=CustomSearchAPIKEY, author=book.author[0])
+        else:
+            return render_template(
+            'duplicate-books-viewer-only.html',
+            super_category_name=super_category_name, book=book,
+            bookCopies=bookCopies, genre=genre_name, author=book.author[0])
     else:
-        return render_template('duplicate-books-viewer-only.html', super_category_name=super_category_name, book=book, bookCopies=bookCopies, genre=genre_name)
+        authors = ""
+        for author in book.author:
+            authors += author + ", "
+        authors = authors[:len(authors)-2]
+        # makes sure the page only loads the edit and delete info if the
+        # user is logged in and it is their book!
+        if(login_session['user_id'] == book.user_id):
+            return render_template(
+            'duplicate-books.html', super_category_name=super_category_name,
+            book=book, bookCopies=bookCopies, genre=genre_name,
+            API_KEY=CustomSearchAPIKEY, author=authors)
+        else:
+            return render_template(
+            'duplicate-books-viewer-only.html',
+            super_category_name=super_category_name, book=book,
+            bookCopies=bookCopies, genre=genre_name, author=authors)
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
 @app.route(
