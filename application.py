@@ -626,17 +626,28 @@ def addGenre():
         name = request.form['name']
         superCategoryName = request.form['category']
         user_id = login_session['user_id']
-        superCategory = session.query(
-                SuperCategory).filter_by(name=superCategoryName).one()
-        newGenre = Genre(
+        # checks to see if the genre is a duplicate, will
+        # not add it if it is a duplicate e.g. already exists)
+        if(not session.query(exists().where(
+                Genre.name == name).where(
+                Genre.user_id == user_id)).scalar()):
+            superCategory = session.query(
+                    SuperCategory).filter_by(name=superCategoryName).one()
+            newGenre = Genre(
                     name=name,
                     super_category=superCategory, user_id=user_id)
-        session.add(newGenre)
-        session.commit()
-        flash(newGenre.name + " genre added!")
-        allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
-        return render_template('new-book.html', allGenres=allMyGenres)
-    else:
+            session.add(newGenre)
+            session.commit()
+            flash(newGenre.name + " genre added!")
+            allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
+            return render_template('new-book.html', allGenres=allMyGenres)
+        else:  # case where the genre is a duplicate
+            flash(name + " is already a genre!")
+            superCategories = session.query(SuperCategory).all()
+            return render_template(
+                        'new-genre.html',
+                        allSuperCategories=superCategories)
+    else:  # returns page for "new-genre.html" upon a GET request
         superCategories = session.query(SuperCategory).all()
         return render_template(
                     'new-genre.html',
