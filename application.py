@@ -494,8 +494,7 @@ def duplicateBookViewer(super_category_name, genre_name, book_id):
     book = session.query(BookItem).filter_by(id=book_id).one()
     bookCopies = session.query(BookItem).filter_by(title=book.title).all()
     if(login_session['user_id'] == book.user_id):
-        print(book.user_id)
-        return render_template('duplicate-books.html', super_category_name=super_category_name, book=book, bookCopies=bookCopies, genre=genre_name)
+        return render_template('duplicate-books.html', super_category_name=super_category_name, book=book, bookCopies=bookCopies, genre=genre_name, API_KEY=CustomSearchAPIKEY)
     else:
         return render_template('duplicate-books-viewer-only.html', super_category_name=super_category_name, book=book, bookCopies=bookCopies, genre=genre_name)
 
