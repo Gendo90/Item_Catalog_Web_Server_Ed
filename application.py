@@ -438,9 +438,18 @@ def viewPage(super_category_name, genre_name, book_id):
     print(genreBooks)
     # find duplicate book entries to set up the link to the duplicate page!
     # DOES NOT WORK YET!
-    duplicateBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).group_by(BookItem.title)
-    # code that determines if there are one or more authors for the book
     book = session.query(BookItem).filter_by(id=book_id).one()
+    duplicateBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name, BookItem.title==book.title).count()
+    isDuplicate = False
+    if(duplicateBooks>1):
+        isDuplicate = True
+        if len(book.author) == 1:
+            return redirect(url_for(
+            'duplicateBookViewer', super_category_name=super_category_name,
+            genre_name=genre_name, book_id=book_id))
+    else:
+        isDuplicate = False
+    # code that determines if there are one or more authors for the book
     title = urllib.parse.quote(book.title)
     if len(book.author) == 1:
         # makes sure the page only loads the edit and delete info if the
@@ -484,7 +493,11 @@ def viewPage(super_category_name, genre_name, book_id):
 def duplicateBookViewer(super_category_name, genre_name, book_id):
     book = session.query(BookItem).filter_by(id=book_id).one()
     bookCopies = session.query(BookItem).filter_by(title=book.title).all()
-    return render_template('duplicate-books.html', book=book.title, bookCopies=bookCopies, genre=genre_name)
+    if(login_session['user_id'] == book.user_id):
+        print(book.user_id)
+        return render_template('duplicate-books.html', super_category_name=super_category_name, book=book, bookCopies=bookCopies, genre=genre_name)
+    else:
+        return render_template('duplicate-books-viewer-only.html', super_category_name=super_category_name, book=book, bookCopies=bookCopies, genre=genre_name)
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
 @app.route(
