@@ -142,15 +142,44 @@ website again.
 
 #### Book JSON
 
-
+Each book has a JSON endpoint that gives the same information as the book
+viewer webpage. A user can access this JSON information by navigating to
+nearly the same path as the book viewer, they would just replace the "view"
+part of the path with "JSON" For example, if a user wanted to retrieve the
+JSON information for a book with id=9, genre="Fantasy", and
+superCategory="Fiction", they would be able to view the book at
+http://localhost:8000/Fiction/Fantasy/9/view and to get the desired JSON
+information, they would need to replace the "view" with "JSON" as mentioned
+earlier, so they would navigate to http://localhost:8000/Fiction/Fantasy/9/JSON
+This path structure should work with all books in the catalog.
 
 #### Genre JSON
 
-
+Each genre has a JSON endpoint as well, that gives information about all the
+books within it. The genres are categorized by their names, so you would
+navigate to the webpage to view all the books in a given genre (e.g.
+http://localhost:8000/Fiction/Fantasy/) and then append "JSON" on the end of
+that path to retrieve the JSON information for that entire genre. For example,
+to get all the books contained within the "Fantasy" genre listed in a single
+JSON file, you could navigate to http://localhost:8000/Fiction/Fantasy/JSON
+This path structure should work with all genres in the catalog, and will
+show you books from different users in the same genre and duplicate books
+in a given genre as well.
 
 #### SuperCategory JSON
 
-
+Each SuperCategory has a JSON endpoint that gives information about all the
+genres within it. The SuperCategories are categorized by their names, so you
+would navigate to the webpage to view all the genres in a given SuperCategory
+(e.g. http://localhost:8000/Fiction/) and then append "JSON" on the end of
+that path to retrieve the JSON information for that entire SuperCategory. For
+example, to get all the genres contained within the "Fiction" SuperCategory
+listed in a single JSON file, you could navigate to
+http://localhost:8000/Fiction/JSON This path structure should work with all
+three SuperCategories in the catalog, and will show you genres from different
+users and list each genre name once (no duplicates in the JSON file even if
+multiple users added the same genre and they are technically different in the
+database).
 
 ## Planned Features/Current Limitations
 
