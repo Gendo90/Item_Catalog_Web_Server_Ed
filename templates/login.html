@@ -89,15 +89,6 @@ function sendTokenToServer() {
       <br />
       <div id="signinButton">
         <button class=login><img id=ggSignIn src= "{{url_for('static', filename='images/GG_Login_Button.jpg')}}" /></button>
-          <!--<div class="g-signin"
-            data-scope="openid email"
-            data-clientid="396893510299-c63590mldo9t9ftg4rb0di77edpfnmj8.apps.googleusercontent.com"
-            data-redirecturi="postmessage"
-            data-accesstype="offline"
-            data-cookiepolicy="single_host_origin"
-            data-callback="signInCallback"
-            data-approvalprompt="force">
-          </div>-->
         </div>
     </div>
     <div class=login_space>
@@ -109,8 +100,6 @@ function sendTokenToServer() {
           <a href='javascript:sendTokenToServer()'>Facebook Login</a>
         </fb:login-button>
       </button>
-      <!--<a href='javascript:sendTokenToServer()'></a>-->
-      <!--<img src="{{url_for('static', filename='images/FB_Login_Button.jpg')}}" />-->
     </div>
   </div>
 
@@ -169,7 +158,7 @@ function sendTokenToServer() {
           $.ajax({
             type: 'POST',
             url: '/gconnect?state={{STATE}}', //need to allow to the credentials on google's API
-            //server to allow the redirection to http://localhost:5000/gconnect because of this url
+            //server to allow the redirection to http://localhost:8000/gconnect because of this url
             processData: false,
             contentType: 'application/octet-stream; charset=utf-8',
             data: authResult['code'],
@@ -183,7 +172,7 @@ function sendTokenToServer() {
                   window.location.href = "/";
                 }, 4000);
                 //need to allow to the credentials on google's API server to
-                //allow the redirection to http://localhost:5000/login because
+                //allow the redirection to http://localhost:8000/login because
                 //of this url code after the AJAX request has finished
               }
               else if (authResult['error']) {
