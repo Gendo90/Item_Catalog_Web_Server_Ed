@@ -19,6 +19,8 @@
 
 <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
 
+<!--FACEBOOK SIGN IN -->
+
   <!-- Load the page styles. -->
   <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet" type='text/css'>
 </head>
@@ -86,8 +88,8 @@ function sendTokenToServer() {
       <div class=login_line></div>
       <br />
       <div id="signinButton">
-        <!--<img src= "{{url_for('static', filename='images/GG_Login_Button.jpg')}}" />-->
-          <span class="g-signin"
+        <button class=login><img id=ggSignIn src= "{{url_for('static', filename='images/GG_Login_Button.jpg')}}" /></button>
+          <!--<div class="g-signin"
             data-scope="openid email"
             data-clientid="396893510299-c63590mldo9t9ftg4rb0di77edpfnmj8.apps.googleusercontent.com"
             data-redirecturi="postmessage"
@@ -95,20 +97,19 @@ function sendTokenToServer() {
             data-cookiepolicy="single_host_origin"
             data-callback="signInCallback"
             data-approvalprompt="force">
-          </span>
+          </div>-->
         </div>
     </div>
     <div class=login_space>
       <h2>Facebook Login</h2>
       <div class=FB_login_line></div>
       <br />
-
-      <button>
-        <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">
-          <a href='javascript:sendTokenToServer()'>Login with Facebook</a>
+      <button class=login>
+        <fb:login-button size="xlarge" scope="public_profile,email" onlogin="sendTokenToServer();">
+          <a href='javascript:sendTokenToServer()'>Facebook Login</a>
         </fb:login-button>
       </button>
-
+      <!--<a href='javascript:sendTokenToServer()'></a>-->
       <!--<img src="{{url_for('static', filename='images/FB_Login_Button.jpg')}}" />-->
     </div>
   </div>
@@ -116,9 +117,50 @@ function sendTokenToServer() {
   <div id='result'>
   </div>
 
-  <!--GOOGLE PLUS SIGN IN -->
+  <!--END FACEBOOK SIGN IN -->
 
-    <script>
+
+  <!--GOOGLE PLUS SIGN IN -->
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+      // Function used to help render the custom Google Login button
+      (function() {
+        var po = document.createElement('script');
+        po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/client:plusone.js?onload=render';
+        var s = document.getElementsByTagName('script')[0];
+        s.parentNode.insertBefore(po, s);
+        })();
+
+
+        // Function used to help render the custom Google Login button
+        function render() {
+          gapi.signin.render('signinButton', {
+            'scope':"openid email",
+            'clientid':"396893510299-c63590mldo9t9ftg4rb0di77edpfnmj8.apps.googleusercontent.com",
+            'redirecturi':"postmessage",
+            'accesstype':"offline",
+            'cookiepolicy':"single_host_origin",
+            'callback':"signInCallback",
+            'approvalprompt':"force"
+            });
+          }
+
+
+      // Allow Google Login button to change when user hovers over it!
+      $(function() {
+        $("#ggSignIn").hover(
+          function(){
+            $(this).attr('src', "{{url_for('static', filename='images/GG_Login_Button2.jpg')}}");
+          },
+          function(){
+            $(this).attr('src', "{{url_for('static', filename='images/GG_Login_Button.jpg')}}");
+          }
+        );
+      });
+
+      // Callback function upon clicking the Google Login button, asks viewer
+      // to sign in using Google
       function signInCallback(authResult) {
         if (authResult['code']) {
           //remove the login button
@@ -158,10 +200,6 @@ function sendTokenToServer() {
     </script>
 
     <!--END GOOGLE PLUS SIGN IN -->
-
-
-
-<!--END FACEBOOK SIGN IN -->
 
 
 </body>

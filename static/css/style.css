@@ -38,6 +38,14 @@ button, .submit_description, .submit_book {
   height: 48px;
 }
 
+button.login {
+  background-color: inherit;
+  border: none;
+  padding: 0px;
+  cursor: pointer;
+  height: auto;
+}
+
 .heading, .loggedinheading, .origheading {
   margin-top: 0px;
   padding-top: 3px;
