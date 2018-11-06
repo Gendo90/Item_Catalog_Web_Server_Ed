@@ -11,31 +11,32 @@ database methods.
 
 ## Setup
 
-This website is run from the "application.py" python script which acts as the
-"server" or back-end application. You can run this directly without creating a
-script to load the database with information first, but it is recommended that
-you create and run a script similar to "preload_booklist_with_users.py" so that
-the "booklistwithusers.db" is created **before** running the server and is
-populated with some books and their descriptions, genres, etc. You could make
-the entries with the user_id set to 1, which signifies the first user of the
-website, which would be **you**, assuming you login before anyone else. If you
-decide not to create a script to load all your books and genres into the
-website's database, the main page of the website will load only the three main
-"SuperCategory" entries into the database (e.g. "Fiction", "Non-Fiction", and
-"Reference") when accessed, without any genres or books for any users. Thus,
-you would need to manually add all the genres and books you want for yourself,
-because the database is empty other than those three SuperCategory entities.
+This website is run from the "[application.py][1]" python script which acts as
+the "server" or back-end application. You can run this directly without
+creating a script to load the database with information first, but it is
+recommended that you create and run a script similar to
+"[preload_booklist_with_users.py][2]" so that the "booklistwithusers.db" is
+created **before** running the server and is populated with some books and
+their descriptions, genres, etc. You could make the entries with the user_id
+set to 1, which signifies the first user of the website, which would be
+**you**, assuming you login before anyone else. If you decide not to create a
+script to load all your books and genres into the website's database, the main
+page of the website will load only the three main "SuperCategory" entries into
+the database (e.g. "Fiction", "Non-Fiction", and "Reference") when accessed,
+without any genres or books for any users. Thus, you would need to manually
+add all the genres and books you want for yourself, because the database is
+empty other than those three SuperCategory entities.
 
 Regardless of whether or not a database is created before running the
-"application.py" server script, the script should be run from the command line
-by entering the `python application.py` command after having navigated to the
-directory containing the "application.py" file. The directory structure is
-highly rigid for this application, because the Flask framework requires
-certain folders to be named "templates" and "static", so the server may not
-work correctly if any of the files in these folders are moved, or deleted, so
-please maintain the directory structure as it is given to ensure the server
-works properly. You can learn more about this requirement in Flask
-[here for templates][1] and [here for static files][2].
+"[application.py][1]" server script, the script should be run from the command
+line by entering the `python application.py` command after having navigated to
+the directory containing the "[application.py][1]" file. The directory
+structure is highly rigid for this application, because the Flask framework
+requires certain folders to be named "templates" and "static", so the server
+may not work correctly if any of the files in these folders are moved, or
+deleted, so please maintain the directory structure as it is given to ensure
+the server works properly. You can learn more about this requirement in Flask
+[here for templates][3] and [here for static files][4].
 
 After running the `python application.py` command, you should be able to access
 the website application at the "localhost:8000" address in a browser. Login is
@@ -89,6 +90,26 @@ Flask decorator as "/newbook" After adding a book, the website notifies the
 user that a book has been successfully added using a "flash" message and
 redirects to the page on which to view the book.
 
+#### Edit A Book
+
+A user may edit a book in their collection when logged into the website. The
+user should navigate to the view page for the book that they would like to
+edit after logging in, and then press the "Edit" button. This will allow the
+user to edit their description and notes for a given book, on the same view
+page. After editing a book's description, the website will redirect to the
+same book view page, with the new, updated description shown.
+
+#### Remove A Book
+
+A user may remove a book in their collection when logged into the website. The
+user should navigate to the view page for the book that they would like to
+edit after logging in, and then press the "Delete" button. A confirmation
+window will appear asking if the user would really like to delete the book
+from their collection, and the options are "Ok" or "Cancel" - if the user
+selects "Ok", the book is deleted, and if they select "Cancel", the
+confirmation window disappears and nothing happens (i.e. the book is not
+removed).
+
 #### Logout
 
 Logout is one of the easiest actions to take using this app - a user who is
@@ -99,31 +120,6 @@ accounts for authorization, so they would need to log back in using one of
 these providers if they want to add, edit, or delete their books on the
 website again.
 
-##---copied from earlier, full-stack project for structure/formatting!---
-
-## Major Functions
-
-### `most_pop_articles()`
-
-Used to find the newspaper's most popular articles, determined by the number of
-views by visitors to the website. The results include all the articles on the
-website, ordered by views of each article.
-
-### `most_pop_authors()`
-
-Used to find the newspaper's most popular authors, determined from views of
-their articles on the newspaper website. The authors are listed in order of
-popularity, using their article views to rank them. The number of total views
-of their articles on the newspaper website are also given for each author.
-
-### `over_perc_error()`
-
-Used to find the days when there was an unacceptable error rate for users
-loading the website, which was 1% in this case. This function gives the dates
-and the percentage error that exceeded the acceptable error rate. This error
-rate is modifiable in the `check_perc_error()` sub-function that runs as part
-of this `over_perc_error()` function. This function also prints the date range
-that will be examined for unacceptable error rates.
 
 ## Planned Features/Current Limitations
 
@@ -136,22 +132,30 @@ Soon you will be able to view books and genres **only** in your collection and
 nothing from any other user's collection by following a "My Collection" link
 when logged in!
 
+There will also be a footer added to the website displaying information like
+contact information, year(s) during which the website was developed and
+maintained, and possibly some quick links to pages like the home page and the
+"My Collection" pages and possibly recently visited pages on the site.
+
 Another planned upgrade would allow more books to be added each day, while
 enabling a revenue stream as an Amazon Associate. This upgrade consists of
 replacing the Google Custom Search API currently used to find book cover
 images with an Amazon API that returns images for their book products. This
-restricts the image search work only when locating products that Amazon has, but
-their product database is extensive, so most books can be found without any
-issues. As a benefit, however, this upgrade would allow unlimited image searches
-every day, and could generate income for the website from purchases made by
-users referred to Amazon through a link to the book attached to the book image.
-The unlimited image searches per day would be a huge improvement over the
-current Google Custom Search API which allows up to **100 searches for free**
-before paying them to allow more searches. Google's Custom Search API was used
-during development because it is easier to access than Amazon's Associate APIs,
-since the website needs a formal address to even register as an Amazon
-Associate. The documentation from Google is more comprehensive and makes their
-API easier to implement as well.
+restricts the image search work only when locating products that Amazon has,
+but their product database is extensive, so most books can be found without any
+issues. As a benefit, however, this upgrade would allow unlimited image
+searches every day, and could generate income for the website from purchases
+made by users referred to Amazon through a link to the book attached to the
+book image. The unlimited image searches per day would be a huge improvement
+over the current Google Custom Search API which allows up to **100 searches
+for free** before paying them to allow more searches. Google's Custom Search
+API was used during development because it is easier to access than Amazon's
+Associate APIs, since the website needs a formal address to even register as
+an Amazon Associate. The documentation from Google is more comprehensive and
+makes their API easier to implement as well.
 
-[1]: https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
-[2]: http://exploreflask.com/en/latest/static.html
+[1]: application.py
+[2]: preload_booklist_with_users.py
+[3]:
+https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
+[4]: http://exploreflask.com/en/latest/static.html
