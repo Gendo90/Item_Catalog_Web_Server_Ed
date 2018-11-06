@@ -662,33 +662,42 @@ def addGenre():
 
 
 # used to get the JSON info for a particular book
-@app.route('/<string:super_category_name>/<int:genre_id>/<int:book_id>/JSON')
-def singleBookJSON(super_category_name, genre_id, book_id):
+@app.route('/<string:super_category_name>/\
+            <string:genre_name>/<int:book_id>/JSON'.replace(" ", ""))
+def singleBookJSON(super_category_name, genre_name, book_id):
     try:
-        book = session.query(BookItem).filter(
-                BookItem.genre_id == genre_id, BookItem.id == book_id).one()
-        genre = session.query(Genre).filter_by(id=genre_id).one()
+        # searches within all genres with the given genre_name to find a
+        # book with the given book_id (i.e. verifies that the genre indeed
+        # contains this book in order for the JSON to be returned)
+        book = session.query(BookItem).join(
+            Genre, Genre.id == BookItem.genre_id).filter(
+            Genre.name == genre_name).filter(
+                    BookItem.id == book_id).one()
         return jsonify(BookItems=[book.serialize])
     except exc.NoResultFound:
-        return "That genre id and/or book id could not be found!"
+        return "That genre name and book id combination could not be found!"
 
 
 # used to get the JSON info for an entire genre
-@app.route('/<string:super_category_name>/<int:genre_id>/JSON')
-def genreBooksJSON(super_category_name, genre_id):
-    genre = session.query(Genre).filter_by(id=genre_id).one()
-    items = session.query(BookItem).filter_by(
-        genre_id=genre_id).all()
+@app.route('/<string:super_category_name>/<string:genre_name>/JSON')
+def genreBooksJSON(super_category_name, genre_name):
+    # items gives all the books in the genre(s) that match the given
+    # genre_name - there may be different users with books in the same genre,
+    # but they are technically separate "genres" in the database
+    items = session.query(BookItem).join(
+        Genre, Genre.id == BookItem.genre_id).filter(
+        Genre.name == genre_name).all()
     return jsonify(BookItems=[i.serialize for i in items])
 
 
 # used to get the JSON info for an entire supercategory
 @app.route('/<string:super_category_name>/JSON/')
 def superCategoryJSON(super_category_name):
-    super_category = session.query(
-            SuperCategory).filter_by(name=super_category_name).one()
-    genresInCategory = session.query(
-            Genre).filter_by(super_category_id=super_category.id).all()
+    # single SQL query to get all genre names within a given supercategory,
+    # for all users' genres
+    genresInCategory = session.query(Genre).join(
+        SuperCategory, SuperCategory.id == Genre.super_category_id).filter(
+        SuperCategory.name == super_category_name).group_by(Genre.name)
     return jsonify(Genre=[i.serialize for i in genresInCategory])
 
 
