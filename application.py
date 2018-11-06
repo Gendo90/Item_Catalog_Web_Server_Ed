@@ -392,7 +392,9 @@ def superCategoryMainPage(super_category_name):
         # the same name (e.g. two different "Fantasy" genres for different
         # user id's will only show once)
         containedGenres = session.query(
-                Genre).filter_by(super_category_id=thisCategory.id).from_self().group_by(Genre.name).all()
+                Genre).filter_by(
+                super_category_id=thisCategory.id).from_self().group_by(
+                    Genre.name).all()
 
         return render_template(
             'genreIndex.html',
@@ -409,12 +411,9 @@ def superCategoryMainPage(super_category_name):
 # genre!
 @app.route("/<string:super_category_name>/<string:genre_name>/")
 def listGenre(super_category_name, genre_name):
-    #book_alias1 = aliased(BookItem)
-    #book_alias2 = aliased(BookItem)
-    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).group_by(BookItem.title)
-    # print(genreBooks)
-    # genre_id_list = session.query(genre).
-    # genreBooks = session.query(BookItem).filter_by(genre_id=genre.id).all()
+    genreBooks = session.query(BookItem).join(
+        Genre, Genre.id == BookItem.genre_id).filter(
+        Genre.name == genre_name).group_by(BookItem.title)
 
     return render_template(
         'genre-list.html',
@@ -423,24 +422,27 @@ def listGenre(super_category_name, genre_name):
 
 
 # Book Viewer page for the website
-@app.route('/<string:super_category_name>/<string:genre_name>/<int:book_id>/view')
+@app.route('/<string:super_category_name>/\
+        <string:genre_name>/<int:book_id>/view'.replace(" ", ""))
 def viewPage(super_category_name, genre_name, book_id):
     # ensures there is a login session user id to compare against
     try:
         login_session['user_id']
     except KeyError:
         login_session['user_id'] = -0.1
-    # new plan - get duplicate book titles first, then check book titles vs duplicate book
-    # titles, then remove duplicate book titles
+    # new plan - get duplicate book titles first, then check book titles vs
+    # duplicate book titles, then remove duplicate book titles
     # update this genre query so that it returns all books for the given
     # genre, regardless of the user
-    genreBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name).group_by(BookItem.title)
-    print(genreBooks)
+    genreBooks = session.query(BookItem).join(
+        Genre, Genre.id == BookItem.genre_id).filter(
+        Genre.name == genre_name).group_by(BookItem.title)
     # find duplicate book entries to set up the link to the duplicate page!
-    # DOES NOT WORK YET!
     book = session.query(BookItem).filter_by(id=book_id).one()
-    duplicateBooks = session.query(BookItem).join(Genre, Genre.id==BookItem.genre_id).filter(Genre.name==genre_name, BookItem.title==book.title).count()
-    if(duplicateBooks>1):
+    duplicateBooks = session.query(BookItem).join(
+        Genre, Genre.id == BookItem.genre_id).filter(
+        Genre.name == genre_name, BookItem.title == book.title).count()
+    if(duplicateBooks > 1):
         isDuplicate = True
         return redirect(url_for(
             'duplicateBookViewer', super_category_name=super_category_name,
@@ -483,22 +485,25 @@ def viewPage(super_category_name, genre_name, book_id):
                 genre=genre_name, genreBooks=genreBooks, book=book,
                 author=authors)
 
+
 # Viewer for duplicate books on the website
-@app.route('/<string:super_category_name>/<string:genre_name>/<int:book_id>/view/duplicates')
+@app.route('/<string:super_category_name>/\
+        <string:genre_name>/<int:book_id>/view/duplicates'.replace(" ", ""))
 def duplicateBookViewer(super_category_name, genre_name, book_id):
     book = session.query(BookItem).filter_by(id=book_id).one()
     bookCopies = session.query(BookItem).filter_by(title=book.title).all()
     if len(book.author) == 1:
         if(login_session['user_id'] == book.user_id):
             return render_template(
-            'duplicate-books.html', super_category_name=super_category_name,
-            book=book, bookCopies=bookCopies, genre=genre_name,
-            API_KEY=CustomSearchAPIKEY, author=book.author[0])
+                'duplicate-books.html',
+                super_category_name=super_category_name,
+                book=book, bookCopies=bookCopies, genre=genre_name,
+                API_KEY=CustomSearchAPIKEY, author=book.author[0])
         else:
             return render_template(
-            'duplicate-books-viewer-only.html',
-            super_category_name=super_category_name, book=book,
-            bookCopies=bookCopies, genre=genre_name, author=book.author[0])
+                'duplicate-books-viewer-only.html',
+                super_category_name=super_category_name, book=book,
+                bookCopies=bookCopies, genre=genre_name, author=book.author[0])
     else:
         authors = ""
         for author in book.author:
@@ -508,14 +513,16 @@ def duplicateBookViewer(super_category_name, genre_name, book_id):
         # user is logged in and it is their book!
         if(login_session['user_id'] == book.user_id):
             return render_template(
-            'duplicate-books.html', super_category_name=super_category_name,
-            book=book, bookCopies=bookCopies, genre=genre_name,
-            API_KEY=CustomSearchAPIKEY, author=authors)
+                'duplicate-books.html',
+                super_category_name=super_category_name,
+                book=book, bookCopies=bookCopies, genre=genre_name,
+                API_KEY=CustomSearchAPIKEY, author=authors)
         else:
             return render_template(
-            'duplicate-books-viewer-only.html',
-            super_category_name=super_category_name, book=book,
-            bookCopies=bookCopies, genre=genre_name, author=authors)
+                'duplicate-books-viewer-only.html',
+                super_category_name=super_category_name, book=book,
+                bookCopies=bookCopies, genre=genre_name, author=authors)
+
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre
 @app.route(
@@ -563,7 +570,7 @@ def addBook():
             desc = request.form['description']
             genre = request.form['genre']
             thisGenre = session.query(Genre).filter(
-                Genre.name==genre, Genre.user_id==user_id).one()
+                Genre.name == genre, Genre.user_id == user_id).one()
             # checks to see if book title and genre are duplicates, will
             # not add them if they both are
             if(not session.query(exists().where(
@@ -576,14 +583,14 @@ def addBook():
                     session.add(newBook)
                     session.commit()
                     thisBook = session.query(BookItem).filter(
-                            BookItem.title==title,
-                            BookItem.user_id==user_id).one()
+                            BookItem.title == title,
+                            BookItem.user_id == user_id).one()
                     print(thisBook.title)
                     flash(thisBook.title + " added!")
             else:
                 thisBook = session.query(BookItem).filter(
-                BookItem.title==title,
-                BookItem.genre_id==thisGenre.id).one()
+                    BookItem.title == title,
+                    BookItem.genre_id == thisGenre.id).one()
                 flash(thisBook.title + " already exists in your collection!")
             return redirect(url_for(
                 'viewPage',
