@@ -11,11 +11,28 @@ database methods.
 
 ## Setup
 
-This website is run from the "[application.py][1]" python script which acts as
+The first step in setting up this app is cloning the "fullstack-nanodegree-vm"
+repository provided by this course [here][1]. The full Flask application must
+be located in the "vagrant/catalog" directory to allow the Vagrant virtual
+machine (VM) to run it properly, so the user should place the project zip file
+there and then unzip it in that location (i.e. "vagrant/catalog").
+
+In order to run this "Best Books" catalog application, the user must navigate
+to the "vagrant" folder on your computer, then start their VM by entering the
+command `vagrant up`. After the VM starts, the user should navigate to the
+"catalog" directory within the "vagrant" folder.
+
+
+Now, the user can start the project by entering `python application.py` within
+the command line for the Vagrant VM. The catalog app will be available on
+[localhost:8000][2] once the "[application.py][3]" script has been executed in
+this manner.
+
+This website is run from the "[application.py][3]" python script which acts as
 the "server" or back-end application. You can run this directly without
 creating a script to load the database with information first, but it is
 recommended that you create and run a script similar to
-"[preload_booklist_with_users.py][2]" so that the "booklistwithusers.db" is
+"[preload_booklist_with_users.py][4]" so that the "booklistwithusers.db" is
 created **before** running the server and is populated with some books and
 their descriptions, genres, etc. You could make the entries with the user_id
 set to 1, which signifies the first user of the website, which would be
@@ -28,15 +45,16 @@ add all the genres and books you want for yourself, because the database is
 empty other than those three SuperCategory entities.
 
 Regardless of whether or not a database is created before running the
-"[application.py][1]" server script, the script should be run from the command
-line by entering the `python application.py` command after having navigated to
-the directory containing the "[application.py][1]" file. The directory
+"[application.py][3]" server script, the script should be run from the command
+line by entering the `python application.py` command after having started the
+Vagrant VM and navigated to the directory containing the "[application.py][3]"
+file in the "vagrant/catalog" folder as described above. The directory
 structure is highly rigid for this application, because the Flask framework
 requires certain folders to be named "templates" and "static", so the server
 may not work correctly if any of the files in these folders are moved, or
 deleted, so please maintain the directory structure as it is given to ensure
 the server works properly. You can learn more about this requirement in Flask
-[here for templates][3] and [here for static files][4].
+[here for templates][5] and [here for static files][6].
 
 After running the `python application.py` command, you should be able to access
 the website application at the "localhost:8000" address in a browser. Login is
@@ -120,6 +138,19 @@ accounts for authorization, so they would need to log back in using one of
 these providers if they want to add, edit, or delete their books on the
 website again.
 
+### API's Available
+
+#### Book JSON
+
+
+
+#### Genre JSON
+
+
+
+#### SuperCategory JSON
+
+
 
 ## Planned Features/Current Limitations
 
@@ -154,8 +185,10 @@ Associate APIs, since the website needs a formal address to even register as
 an Amazon Associate. The documentation from Google is more comprehensive and
 makes their API easier to implement as well.
 
-[1]: application.py
-[2]: preload_booklist_with_users.py
-[3]:
+[1]: https://github.com/udacity/fullstack-nanodegree-vm
+[2]: http://localhost:8000
+[3]: application.py
+[4]: preload_booklist_with_users.py
+[5]:
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
-[4]: http://exploreflask.com/en/latest/static.html
+[6]: http://exploreflask.com/en/latest/static.html
