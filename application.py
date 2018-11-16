@@ -20,6 +20,10 @@ from flask import make_response
 import requests
 import urllib
 
+# import database packages
+import postgresql
+import psycopg2
+
 # create the flask object "app"
 app = Flask(__name__)
 
@@ -32,7 +36,8 @@ CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Book Collector App"
 
-engine = create_engine('sqlite:///booklistwithusers.db')
+engine = create_engine(
+        'postgresql+psycopg2://postgres:postgres@localhost/books')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
