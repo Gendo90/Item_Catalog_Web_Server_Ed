@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, SuperCategory, Genre, BookItem
+import psycopg2
 
-engine = create_engine('sqlite:///booklistwithusers.db')
+engine = create_engine('postgresql+psycopg2://admin:Aoq7M9@localhost/books')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()

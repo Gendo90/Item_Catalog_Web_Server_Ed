@@ -5,7 +5,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 import psycopg2
-import postgres
 
 Base = declarative_base()
 
@@ -105,6 +104,6 @@ class BookItem(Base):
 
 
 engine = create_engine(
-        'postgresql+psycopg2://postgres:postgres@localhost/books')
+        'postgresql+psycopg2://admin:Aoq7M9@localhost/books')
 
 Base.metadata.create_all(engine)
