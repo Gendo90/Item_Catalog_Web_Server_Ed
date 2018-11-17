@@ -397,19 +397,20 @@ def disconnect():
 def superCategoryMainPage(super_category_name):
     thisCategory = session.query(
             SuperCategory).filter_by(name=super_category_name).one()
+    print("The supercategory name  is " + thisCategory.name)
     try:
         # modified so that it only shows one genre if there are multiple with
         # the same name (e.g. two different "Fantasy" genres for different
         # user id's will only show once)
         containedGenres = session.query(
-                Genre).filter_by(
-                super_category_id=thisCategory.id).from_self().group_by(
-                    Genre.name).all()
+                Genre.super_category_id, Genre.name).filter_by(
+                super_category_id=thisCategory.id).group_by( # removed a "from_self" here, added an order_by
+                    Genre.super_category_id, Genre.name).all()
 
         return render_template(
             'genreIndex.html',
             superCategory=thisCategory.name, genres=containedGenres)
-    except exc.NoResultFound:
+    except exc.NoResultFound or exc.ProgrammingError:
         # case where there are no genres or books for this user yet - like
         # a new user!
         return render_template(
