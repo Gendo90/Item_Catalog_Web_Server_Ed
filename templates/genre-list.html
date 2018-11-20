@@ -56,7 +56,7 @@
         {% if bookList %}
                                       {% for book in bookList %}
         <div class=sidebar_links>
-          <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_id=book.id)}}>{{book.title}}</a></h3>
+          <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_title=book.title)}}>{{book.title}}</a></h3>
             <br />
         </div>
                                       {% endfor %}

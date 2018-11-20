@@ -53,7 +53,7 @@
       <div class=add_book><a href='{{url_for('addBook')}}'><button class="new_book" type=button>Add Another Book!</button></a></div>
                                       {% for item in genreBooks %}
       <div class=sidebar_links>
-        <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_id=item.id)}}>{{item.title}}</a></h3>
+        <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_title=item.title)}}>{{item.title}}</a></h3>
         <br />
       </div>
                                       {% endfor %}
@@ -74,7 +74,7 @@
         <div class=book_info>
           Author: {{author}}
           <p class="description" id="current_description">Description: {{book.description}}</p>
-          <form action="./edit" method="POST" id="edit_desc_form">
+          <form action="../{{book.id}}/edit" method="POST" id="edit_desc_form">
             <p>Description:</p>
             <textarea name="updated_description" rows=8 form="edit_desc_form">{{book.description}}</textarea>
             <input class="submit_description" type="submit"/>
@@ -123,7 +123,7 @@
         var url = `${data.items[0].link}`
         console.log(url)
 
-        $.post('./cover_pic/' + url)
+        $.post('../{{book.id}}/cover_pic/' + url)
 
         $("#loading_img").attr('src', url);
     });
@@ -134,7 +134,7 @@
   $(".delete").on("click", function check_delete(){
     delete_response = confirm("Are you sure you want to delete this book?");
     if (delete_response === true) {
-      $.post('./delete');
+      $.post('../{{book.id}}/delete');
       setTimeout(function(){
         window.location.replace('/{{super_category_name}}/{{genre}}');
       }, 1000);

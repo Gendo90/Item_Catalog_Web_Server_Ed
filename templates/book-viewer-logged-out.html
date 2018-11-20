@@ -60,7 +60,7 @@
       {% endif %}
                                       {% for item in genreBooks %}
       <div class=sidebar_links>
-        <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_id=item.id)}}>{{item.title}}</a></h3>
+        <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_title=item.title)}}>{{item.title}}</a></h3>
         <br />
       </div>
                                       {% endfor %}

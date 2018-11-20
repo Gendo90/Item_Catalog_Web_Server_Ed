@@ -2,7 +2,7 @@
 from flask import Flask, render_template, url_for, redirect, jsonify, flash
 from flask import request
 
-from sqlalchemy import create_engine, exists
+from sqlalchemy import create_engine, exists, func, distinct
 from sqlalchemy.orm import sessionmaker, exc, aliased
 from database_setup import Base, User, SuperCategory, Genre, BookItem
 
@@ -426,9 +426,9 @@ def superCategoryMainPage(super_category_name):
 # genre!
 @app.route("/<string:super_category_name>/<string:genre_name>/")
 def listGenre(super_category_name, genre_name):
-    genreBooks = session.query(BookItem.title, BookItem.id).join(
+    genreBooks = session.query(BookItem.title).join(
         Genre, Genre.id == BookItem.genre_id).filter(
-        Genre.name == genre_name).group_by(BookItem.id, BookItem.title)
+        Genre.name == genre_name).group_by(BookItem.title)
 
     return render_template(
         'genre-list.html',
@@ -438,8 +438,8 @@ def listGenre(super_category_name, genre_name):
 
 # Book Viewer page for the website
 @app.route('/<string:super_category_name>/\
-        <string:genre_name>/<int:book_id>/view'.replace(" ", ""))
-def viewPage(super_category_name, genre_name, book_id):
+        <string:genre_name>/<string:book_title>/view'.replace(" ", ""))
+def viewPage(super_category_name, genre_name, book_title):
     # ensures there is a login session user id to compare against
     try:
         login_session['user_id']
@@ -449,11 +449,11 @@ def viewPage(super_category_name, genre_name, book_id):
     # duplicate book titles, then remove duplicate book titles
     # update this genre query so that it returns all books for the given
     # genre, regardless of the user
-    genreBooks = session.query(BookItem.id, BookItem.title).join(
+    genreBooks = session.query(BookItem.title).join(
         Genre, Genre.id == BookItem.genre_id).filter(
-        Genre.name == genre_name).group_by(BookItem.id, BookItem.title)
+        Genre.name == genre_name).group_by(BookItem.title)
     # find duplicate book entries to set up the link to the duplicate page!
-    book = session.query(BookItem).filter_by(id=book_id).one()
+    book = session.query(BookItem).filter_by(title=book_title).first()
     duplicateBooks = session.query(BookItem.title).join(
         Genre, Genre.id == BookItem.genre_id).filter(
         Genre.name == genre_name, BookItem.title == book.title).count()
@@ -461,7 +461,7 @@ def viewPage(super_category_name, genre_name, book_id):
         isDuplicate = True
         return redirect(url_for(
             'duplicateBookViewer', super_category_name=super_category_name,
-            genre_name=genre_name, book_id=book_id))
+            genre_name=genre_name, book_id=book.id))
     # code that determines if there are one or more authors for the book
     if len(book.author) == 1:
         # makes sure the page only loads the edit and delete info if the
@@ -571,7 +571,7 @@ def editBook(super_category_name, genre_name, book_id):
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
-            genre_name=genre_name, book_id=book_id))
+            genre_name=genre_name, book_title=thisBook.title))
 
 
 # webpage that creates a new book
@@ -610,7 +610,7 @@ def addBook():
             return redirect(url_for(
                 'viewPage',
                 super_category_name=thisGenre.super_category.name,
-                genre_name=genre, book_id=thisBook.id))
+                genre_name=genre, book_title=thisBook.title))
         else:
             allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
             return render_template('new-book.html', allGenres=allMyGenres)
@@ -635,7 +635,7 @@ def setCoverImg(super_category_name, genre_name, book_id, imgLocation):
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
-            genre_name=genre_name, book_id=book_id))
+            genre_name=genre_name, book_title=thisBook.title))
 
 
 # webpage that creates a new genre, with a form that uses POST to send the
