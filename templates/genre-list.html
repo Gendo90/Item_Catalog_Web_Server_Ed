@@ -52,12 +52,15 @@
       {% if session['email'] %}
       <div class=add_book><a href='{{url_for('addBook')}}'><button class="new_book" type=button>Add Another Book!</button></a></div>
       {% endif %}
+
+        {% if bookList %}
                                       {% for book in bookList %}
         <div class=sidebar_links>
           <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_id=book.id)}}>{{book.title}}</a></h3>
             <br />
         </div>
                                       {% endfor %}
+        {% endif %}
     </div>
 
     <div class=main_content>

@@ -426,9 +426,9 @@ def superCategoryMainPage(super_category_name):
 # genre!
 @app.route("/<string:super_category_name>/<string:genre_name>/")
 def listGenre(super_category_name, genre_name):
-    genreBooks = session.query(BookItem).join(
+    genreBooks = session.query(BookItem.title, BookItem.id).join(
         Genre, Genre.id == BookItem.genre_id).filter(
-        Genre.name == genre_name).group_by(BookItem.title)
+        Genre.name == genre_name).group_by(BookItem.id, BookItem.title)
 
     return render_template(
         'genre-list.html',
@@ -449,12 +449,12 @@ def viewPage(super_category_name, genre_name, book_id):
     # duplicate book titles, then remove duplicate book titles
     # update this genre query so that it returns all books for the given
     # genre, regardless of the user
-    genreBooks = session.query(BookItem).join(
+    genreBooks = session.query(BookItem.id, BookItem.title).join(
         Genre, Genre.id == BookItem.genre_id).filter(
-        Genre.name == genre_name).group_by(BookItem.title)
+        Genre.name == genre_name).group_by(BookItem.id, BookItem.title)
     # find duplicate book entries to set up the link to the duplicate page!
     book = session.query(BookItem).filter_by(id=book_id).one()
-    duplicateBooks = session.query(BookItem).join(
+    duplicateBooks = session.query(BookItem.title).join(
         Genre, Genre.id == BookItem.genre_id).filter(
         Genre.name == genre_name, BookItem.title == book.title).count()
     if(duplicateBooks > 1):
