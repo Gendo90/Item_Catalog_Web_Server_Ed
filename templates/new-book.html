@@ -58,7 +58,7 @@
       <div class=new_book_info>
         <div class=new_book_container>
           <div>
-            <form method="POST" action="{{url_for('addBook')}}">
+            <form method="POST" action="{{url_for('addBook', _external=True).replace("http://", "https://www.")}}">
               <p>Book Title:</p>
               <input name='title' type=text placeholder='Title'/>
               <p>Book Author:</p>
