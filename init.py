@@ -50,7 +50,10 @@ session = DBSession()
 
 CustomSearchAPIKEY = "AIzaSyC8gjeQNTOd8EUSKB-A8kCT8JDZaL0zIQM"
 
-app.secret_key = 'secret_key_here!'
+app.secret_key = 'SECOND_secret_key_here!'
+
+# app.config['SERVER_NAME'] = 'bestbookcollection.com'
+
 
 # Main page for the website
 @app.route('/')
@@ -94,17 +97,19 @@ def nocache(view):
 
     return functools.update_wrapper(no_cache, view)
 
+TESTVAR = 0
 
 # login page for the website
 # Create a state token to prevent request forgery.
 # Store it in the session for later validation
 # Show login verification page
 @app.route('/login/')
-@nocache
 def loginPage():
     state = ''.join(random.choice(string.ascii_uppercase +
                     string.digits) for x in range(32))
+    login_session['state'] = 0
     login_session['state'] = state
+    TESTVAR = state
     print("The set login state key is "+login_session['state'])
     return render_template('login.html', STATE=state)
 
@@ -143,6 +148,7 @@ def getUserID(email):
 def gconnect():
     # Validate state token
     print("The login state is: " +login_session['state'])
+    print("THE TESTVAR IS " + str(TESTVAR))
     print("The given state is: " + request.args['state'])
     try:
         if request.args['state'] != login_session['state']:
@@ -237,6 +243,8 @@ def gconnect():
         createUser(login_session)
 
     login_session['user_id'] = getUserID(login_session['email'])
+    print('Your username is: ' +login_session['username'])
+    print('Your UserID is: ' + str(login_session['user_id']))
     return output
 
 
@@ -416,10 +424,10 @@ def disconnect():
         login_session['user_id'] = -0.1
         del login_session['provider']
         flash("You have successfully been logged out.")
-        return redirect(url_for('mainPage'))
+        return render_template('index-logged-in.html') # redirect(url_for('mainPage'))
     else:
         flash("You were not logged in")
-        return redirect(url_for('mainPage'))
+        return render_template('index-logged-in.html') # redirect(url_for('mainPage'))
 
 
 # Three super-categories that link to different pages - the string name should
@@ -635,15 +643,18 @@ def addBook():
                     BookItem.title == title,
                     BookItem.genre_id == thisGenre.id).one()
                 flash(thisBook.title + " already exists in your collection!")
+
+            print(url_for('viewPage', super_category_name=thisGenre.super_category.name, genre_name = genre,
+                book_title=thisBook.title, _external=True))
             return redirect(url_for(
                 'viewPage',
                 super_category_name=thisGenre.super_category.name,
-                genre_name=genre, book_title=thisBook.title))
+                genre_name=genre, book_title=thisBook.title, _external=True).replace("http://", "https://www."))
         else:
             allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
             return render_template('new-book.html', allGenres=allMyGenres)
     except KeyError:
-        return redirect(url_for('loginPage'))
+        return redirect(url_for('loginPage').replace("http://", "https://www."))
 
 
 # webpage that sets the imgURL property for a book so that a picture appears
@@ -663,7 +674,7 @@ def setCoverImg(super_category_name, genre_name, book_id, imgLocation):
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
-            genre_name=genre_name, book_title=thisBook.title))
+            genre_name=genre_name, book_title=thisBook.title).replace('http://', "https://www."))
 
 
 # webpage that creates a new genre, with a form that uses POST to send the
@@ -747,7 +758,7 @@ def superCategoryJSON(super_category_name):
 
 if __name__ == '__main__':
     # secret key used here to enable flash messages
-    app.secret_key = "super_secret_key"
+    app.secret_key = "SECOND_secret_key_here!"
     app.debug = True
     app.run(host='0.0.0.0', port=80)
 
