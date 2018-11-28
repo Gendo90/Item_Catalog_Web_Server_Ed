@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/lib/python3 python3
 from flask import Flask, render_template, url_for, redirect, jsonify, flash
 from flask import request
 
@@ -10,6 +10,11 @@ from database_setup import Base, User, SuperCategory, Genre, BookItem
 from flask import session as login_session
 import random
 import string
+
+# import packages to prevent caching on cloudfront
+from flask import make_response
+from datetime import datetime
+import functools
 
 # import packages for google oauth login
 from oauth2client.client import flow_from_clientsecrets
@@ -34,7 +39,6 @@ app = Flask(__name__)
 # or it will not work
 with app.open_resource('client_secrets.json') as f:
 	byte_output = f.read()
-	print(byte_output.decode('utf-8'))
 	CLIENT_ID = json.loads(str(byte_output.decode('utf-8')))['web']['client_id']
 APPLICATION_NAME = "Book Collector App"
 
@@ -77,16 +81,31 @@ def mainPage():
 
     return render_template('index-logged-in.html')
 
+# function to prevent caching on the routing server
+def nocache(view):
+    @functools.wraps(view)
+    def no_cache(*args, **kwargs):
+        response = make_response(view(*args, **kwargs))
+        response.headers['Last-Modified'] = datetime.now()
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '-1'
+        return response
+
+    return functools.update_wrapper(no_cache, view)
+
 
 # login page for the website
 # Create a state token to prevent request forgery.
 # Store it in the session for later validation
 # Show login verification page
 @app.route('/login/')
+@nocache
 def loginPage():
     state = ''.join(random.choice(string.ascii_uppercase +
                     string.digits) for x in range(32))
     login_session['state'] = state
+    print("The set login state key is "+login_session['state'])
     return render_template('login.html', STATE=state)
 
 
@@ -123,10 +142,19 @@ def getUserID(email):
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
+    print("The login state is: " +login_session['state'])
+    print("The given state is: " + request.args['state'])
+    try:
+        if request.args['state'] != login_session['state']:
+            response = make_response(json.dumps('Invalid state parameter.'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    except KeyError:
+        response = make_response(json.dumps('No state parameter included'), 401)
         response.headers['Content-Type'] = 'application/json'
+        print("State parameter error")
         return response
+
     # Obtain authorization code
     code = request.data
 
@@ -721,4 +749,5 @@ if __name__ == '__main__':
     # secret key used here to enable flash messages
     app.secret_key = "super_secret_key"
     app.debug = True
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=80)
+
