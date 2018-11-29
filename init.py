@@ -495,6 +495,8 @@ def viewPage(super_category_name, genre_name, book_title):
         Genre.name == genre_name, BookItem.title == book.title).count()
     if(duplicateBooks > 1):
         isDuplicate = True
+        print(url_for('duplicateBookViewer', super_category_name=super_category_name,
+            genre_name=genre_name, book_id=book.id, _external=True))
         return redirect(url_for(
             'duplicateBookViewer', super_category_name=super_category_name,
             genre_name=genre_name, book_id=book.id, _external=True).replace("http://", "https://www."))
@@ -588,7 +590,8 @@ def deleteBook(super_category_name, genre_name, book_id):
         session.delete(thisBook)
         session.commit()
         flash(title + " removed!")
-        return render_template('index-logged-in.html')
+        print(title + " removed!")
+        return redirect(url_for('listGenre', super_category_name = super_category_name, genre_name=genre_name, _external=True).replace("http://", "https://www."))
 
 
 # inaccessible webpage (uses POST method only) that edits a book's description
@@ -604,6 +607,9 @@ def editBook(super_category_name, genre_name, book_id):
         title = thisBook.title
         session.commit()
         flash(title + "'s description edited!")
+        print("Edit redirect to " + url_for('viewPage', API_KEY=CustomSearchAPIKEY,
+            super_category_name=super_category_name, genre_name=genre_name, book_title=thisBook.title,
+            _external=True).replace("http://", "https://www."))
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
