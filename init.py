@@ -424,10 +424,10 @@ def disconnect():
         login_session['user_id'] = -0.1
         del login_session['provider']
         flash("You have successfully been logged out.")
-        return render_template('index-logged-in.html') # redirect(url_for('mainPage'))
+        return render_template('index-logged-in.html')
     else:
         flash("You were not logged in")
-        return render_template('index-logged-in.html') # redirect(url_for('mainPage'))
+        return render_template('index-logged-in.html')
 
 
 # Three super-categories that link to different pages - the string name should
@@ -497,7 +497,7 @@ def viewPage(super_category_name, genre_name, book_title):
         isDuplicate = True
         return redirect(url_for(
             'duplicateBookViewer', super_category_name=super_category_name,
-            genre_name=genre_name, book_id=book.id))
+            genre_name=genre_name, book_id=book.id, _external=True).replace("http://", "https://www."))
     # code that determines if there are one or more authors for the book
     if len(book.author) == 1:
         # makes sure the page only loads the edit and delete info if the
@@ -607,7 +607,7 @@ def editBook(super_category_name, genre_name, book_id):
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
-            genre_name=genre_name, book_title=thisBook.title))
+            genre_name=genre_name, book_title=thisBook.title, _external=True).replace("http://", "https://www."))
 
 
 # webpage that creates a new book
@@ -644,8 +644,6 @@ def addBook():
                     BookItem.genre_id == thisGenre.id).one()
                 flash(thisBook.title + " already exists in your collection!")
 
-            print(url_for('viewPage', super_category_name=thisGenre.super_category.name, genre_name = genre,
-                book_title=thisBook.title, _external=True))
             return redirect(url_for(
                 'viewPage',
                 super_category_name=thisGenre.super_category.name,
@@ -654,7 +652,7 @@ def addBook():
             allMyGenres = session.query(Genre).filter_by(user_id=user_id).all()
             return render_template('new-book.html', allGenres=allMyGenres)
     except KeyError:
-        return redirect(url_for('loginPage').replace("http://", "https://www."))
+        return redirect(url_for('loginPage', _external=True).replace("http://", "https://www."))
 
 
 # webpage that sets the imgURL property for a book so that a picture appears
@@ -674,7 +672,7 @@ def setCoverImg(super_category_name, genre_name, book_id, imgLocation):
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
-            genre_name=genre_name, book_title=thisBook.title).replace('http://', "https://www."))
+            genre_name=genre_name, book_title=thisBook.title, _external=True).replace('http://', "https://www."))
 
 
 # webpage that creates a new genre, with a form that uses POST to send the
@@ -761,4 +759,3 @@ if __name__ == '__main__':
     app.secret_key = "SECOND_secret_key_here!"
     app.debug = True
     app.run(host='0.0.0.0', port=80)
-
