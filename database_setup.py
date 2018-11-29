@@ -75,9 +75,9 @@ class BookItem(Base):
 
     author = Column(PickleType(), nullable=False)
 
-    description = Column(String(600))
+    description = Column(String(1000))
 
-    imgURL = Column(String(100))
+    imgURL = Column(String(1000))
 
     genre_id = Column(Integer, ForeignKey('genre.id'), nullable=False)
 
