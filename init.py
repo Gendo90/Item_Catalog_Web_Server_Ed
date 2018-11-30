@@ -495,11 +495,11 @@ def viewPage(super_category_name, genre_name, book_title):
         Genre.name == genre_name, BookItem.title == book.title).count()
     if(duplicateBooks > 1):
         isDuplicate = True
-		try:
-			book = session.query(BookItem).filter(BookItem.title == book_title,
-			BookItem.user_id == login_session['user_id']).one()
-		except:
-			book = session.query(BookItem).filter_by(title=book_title).first()
+        try:
+                book = session.query(BookItem).filter(BookItem.title == book_title,
+                BookItem.user_id == login_session['user_id']).one()
+        except:
+                book = session.query(BookItem).filter_by(title=book_title).first()
         print(url_for('duplicateBookViewer', super_category_name=super_category_name,
             genre_name=genre_name, book_id=book.id, _external=True))
         return redirect(url_for(
