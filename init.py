@@ -740,6 +740,14 @@ def singleBookJSON(super_category_name, genre_name, book_id):
     except exc.NoResultFound:
         return "That genre name and book id combination could not be found!"
 
+# used to get the JSON info for a particular book
+@app.route('/<string:super_category_name>/\
+            <string:genre_name>/<int:book_id>/JSON/'.replace(" ", ""))
+def rerouteToSingleBookJSON(super_category_name, genre_name, book_id):
+    # routes back to the 'singleBookJSON' function
+    return redirect(url_for('singleBookJSON', super_category_name=super_category_name,
+    genre_name=genre_name, book_id=book_id, _external=True).replace('http://', 'https://www.'))
+
 
 # used to get the JSON info for an entire genre
 @app.route('/<string:super_category_name>/<string:genre_name>/JSON')
@@ -752,9 +760,16 @@ def genreBooksJSON(super_category_name, genre_name):
         Genre.name == genre_name).all()
     return jsonify(BookItems=[i.serialize for i in items])
 
+# allows this route to get the JSON info for an entire genre as well
+@app.route('/<string:super_category_name>/<string:genre_name>/JSON/')
+def rerouteToGenreBooksJSON(super_category_name, genre_name):
+    # routes back to the 'genreBooksJSON' function
+    return redirect(url_for('genreBooksJSON', super_category_name=super_category_name,
+    genre_name=genre_name, _external=True).replace('http://', 'https://www.'))
+
 
 # used to get the JSON info for an entire supercategory
-@app.route('/<string:super_category_name>/JSON/')
+@app.route('/<string:super_category_name>/JSON')
 def superCategoryJSON(super_category_name):
     # single SQL query to get all genre names within a given supercategory,
     # for all users' genres
@@ -770,9 +785,14 @@ def superCategoryJSON(super_category_name):
         if i.name not in noDuplicateNames:
             noDuplicateNames.append(i.name)
             genresInCategory.append(i)
-    return jsonify(Genre=[i.serialize for i in genresInCategory])
+    response_json = jsonify(Genre=[i.serialize for i in genresInCategory])
+    return response_json
 
-
+# enables this route for the JSON information as well!
+@app.route('/<string:super_category_name>/JSON/')
+def rerouteToSuperCategoryJSON(super_category_name):
+    # routes back to the 'superCategoryJSON' function
+    return redirect(url_for('superCategoryJSON', super_category_name=super_category_name, _external=True).replace('http://', 'https://www.'))
 
 if __name__ == '__main__':
     # secret key used here to enable flash messages
