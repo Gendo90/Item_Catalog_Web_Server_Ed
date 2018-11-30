@@ -758,9 +758,18 @@ def genreBooksJSON(super_category_name, genre_name):
 def superCategoryJSON(super_category_name):
     # single SQL query to get all genre names within a given supercategory,
     # for all users' genres
-    genresInCategory = session.query(Genre).join(
+    allMatchingGenres = session.query(Genre).join(
         SuperCategory, SuperCategory.id == Genre.super_category_id).filter(
-        SuperCategory.name == super_category_name).group_by(Genre.name)
+        SuperCategory.name == super_category_name).group_by(Genre.name, Genre.id).all()
+	# need to add more code here to make the JSON object query server-friendly
+	# and still give the correct answer - need a GROUP_BY function using
+	# Genre.id above or the server crashes.
+    noDuplicateNames = []
+    genresInCategory = []
+    for i in allMatchingGenres:
+        if i.name not in noDuplicateNames:
+            noDuplicateNames.append(i.name)
+            genresInCategory.append(i)
     return jsonify(Genre=[i.serialize for i in genresInCategory])
 
 
