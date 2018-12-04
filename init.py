@@ -655,10 +655,18 @@ def addBook():
                     print(thisBook.title)
                     flash(thisBook.title + " added!")
             else:
-                thisBook = session.query(BookItem).filter(
-                    BookItem.title == title,
-                    BookItem.genre_id == thisGenre.id).one()
-                flash(thisBook.title + " already exists in your collection!")
+                try:
+                    thisBook = session.query(BookItem).filter(
+                        BookItem.title == title,
+                        BookItem.genre_id == thisGenre.id).one()
+                    flash(thisBook.title + " already exists in your collection!")
+                except exc.NoResultFound:
+                    thisBook = session.query(BookItem).filter(
+                        BookItem.title == title,
+                        BookItem.user_id == user_id).one()
+                    bookGenre = session.query(Genre).filter(Genre.id == thisBook.genre_id).one()
+                    genre = bookGenre.name
+                    flash(thisBook.title + " already exists in the " + genre + " genre!")
 
             return redirect(url_for(
                 'viewPage',
