@@ -141,9 +141,8 @@
     delete_response = confirm("Are you sure you want to delete this book?");
     if (delete_response === true) {
       $.post('../delete');
-      console.log('../delete');
       setTimeout(function(){
-        window.location.replace('/{{super_category_name}}/{{genre}}');
+        window.location.replace('../..');
       }, 1000);
     };
   });
