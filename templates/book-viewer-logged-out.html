@@ -72,7 +72,7 @@
 
 
         <div class=book_img_holder>
-          {% with book.imgURL as bookPath %}
+          {% with bookPath = book.imgURL %}
           {% if book.imgURL %}
           <img class=book_img id=stored_img src ="{{url_for('static', filename='covers/'+bookPath)}}"/>
           {% else %}
