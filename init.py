@@ -29,6 +29,11 @@ import urllib
 # import postgresql
 import psycopg2
 
+# get packages for cover pic images
+import boto3
+import urllib.request
+import os
+
 # create the flask object "app"
 app = Flask(__name__)
 
@@ -678,8 +683,22 @@ def setCoverImg(super_category_name, genre_name, book_id, imgLocation):
     # to set the image
     if(login_session['user_id'] == thisBook.user_id and
             thisBook.imgURL is None):
-        thisBook.imgURL = str(imgLocation)
+        imgPathURL = str(imgLocation)
+        filename = str(imgLocation).replace("/", "_").replace(":", "_").replace("http", "_")
+        print(filename)
+        if(imgPathURL.startswith("https")):
+            imgPathURL=imgPathURL.replace("https:/", "https://")
+        elif(imgPathURL.startswith("http")):
+            imgPathURL=imgPathURL.replace("http:/", "http://")
+        print(imgPathURL)
+        os.chdir('/var/www/html/static/covers')
+        f = open(filename, 'wb')
+        f.write(urllib.request.urlopen(imgPathURL).read())
+        thisBook.imgURL = filename
         session.commit()
+        f.close()
+        os.chdir('/var/www/html')
+        print(thisBook.imgURL)
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,

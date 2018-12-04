@@ -72,11 +72,13 @@
 
 
         <div class=book_img_holder>
+          {% with book.imgURL as bookPath %}
           {% if book.imgURL %}
-          <img class=book_img id=stored_img src ="{{book.imgURL}}"/>
+          <img class=book_img id=stored_img src ="{{url_for('static', filename='covers/'+bookPath)}}"/>
           {% else %}
           <img class=book_img id=loading_img src = "{{url_for('static', filename='images/Loading_icon.gif')}}"/>
           {% endif %}
+          {% endwith %}
         </div>
         <div class=book_info>
           Author: {{author}}
