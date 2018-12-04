@@ -15,7 +15,7 @@ session = DBSession()
 try:
     for item in session.query(SuperCategory).all():
         print(item.name)
-        session.remove(item)
+        session.delete(item)
     session.commit()
 except KeyError:
     pass
@@ -53,9 +53,7 @@ Book_I = BookItem(
         description="A classic fantasy adventure masterpiece, which \
         introduces Middle-Earth to most readers, and serves as a prequel to \
         Tolkien's Lord of the Rings epic saga.", genre=Genre_I,
-        imgURL="""https://i.pinimg.com/236x/
-        46/20/86/46208668db6465c78d5cdb774dfa0e69
-        --hobbit-book-the-hobbit.jpg""".replace(" ", ""), user_id=1)
+        imgURL=None, user_id=1)
 session.add(Book_I)
 
 Book_II = BookItem(
@@ -80,7 +78,7 @@ Book_III = BookItem(
 session.add(Book_III)
 
 Book_IV = BookItem(
-        title="Law for Dummies", author=["John Ventura"],
+        title="Law for Dummies 2nd Ed", author=["John Ventura"],
         description="""A book written by
              a lawyer that explains the basics of different areas of the law, \
              especially common occurrences and legal tips that are directly \
