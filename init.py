@@ -510,6 +510,11 @@ def viewPage(super_category_name, genre_name, book_title):
         return redirect(url_for(
             'duplicateBookViewer', super_category_name=super_category_name,
             genre_name=genre_name, book_id=book.id, _external=True).replace("http://", "https://www."))
+    # code that determines if there are other books with the same title but different genres
+    checkTitle = session.query(BookItem).filter_by(title=book_title).count()
+    if checkTitle > 1:
+        book = session.query(BookItem).join(Genre, Genre.id == BookItem.genre_id).filter(
+            Genre.name == genre_name, BookItem.title == book_title).one()
     # code that determines if there are one or more authors for the book
     if len(book.author) == 1:
         # makes sure the page only loads the edit and delete info if the
@@ -655,7 +660,7 @@ def addBook():
                     thisBook = session.query(BookItem).filter(
                             BookItem.title == title,
                             BookItem.user_id == user_id).one()
-                    print(thisBook.title)
+                    print(thisBook.title + " with a user ID of " + str(thisBook.user_id) + " and a description of " + thisBook.description)
                     flash(thisBook.title + " added!")
             else:
                 try:
