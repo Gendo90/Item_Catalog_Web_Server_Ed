@@ -554,7 +554,10 @@ def viewPage(super_category_name, genre_name, book_title):
         <string:genre_name>/<int:book_id>/view/duplicates'.replace(" ", ""))
 def duplicateBookViewer(super_category_name, genre_name, book_id):
     book = session.query(BookItem).filter_by(id=book_id).one()
-    bookCopies = session.query(BookItem).filter_by(title=book.title).all()
+    bookCopies = session.query(BookItem).filter_by(title=book.title).order_by(BookItem.id).all()
+    if book.imgURL == None:
+        book.imgURL = bookCopies[0].imgURL
+        session.commit()
     if len(book.author) == 1:
         if(login_session['user_id'] == book.user_id):
             return render_template(
