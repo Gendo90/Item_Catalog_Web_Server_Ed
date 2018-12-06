@@ -66,7 +66,6 @@ def mainPage():
     # this code adds the three main supercategories upon starting the server
     # if they are not already present in the database file
     try:
-        print("TEST")
         session.query(SuperCategory).filter_by(name='Fiction').one()
     except exc.NoResultFound:
         # add super-categories that contain the genres
@@ -89,20 +88,6 @@ def mainPage():
 
     return render_template('index-logged-in.html')
 
-# function to prevent caching on the routing server
-def nocache(view):
-    @functools.wraps(view)
-    def no_cache(*args, **kwargs):
-        response = make_response(view(*args, **kwargs))
-        response.headers['Last-Modified'] = datetime.now()
-        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '-1'
-        return response
-
-    return functools.update_wrapper(no_cache, view)
-
-TESTVAR = 0
 
 # login page for the website
 # Create a state token to prevent request forgery.
@@ -114,8 +99,6 @@ def loginPage():
                     string.digits) for x in range(32))
     login_session['state'] = 0
     login_session['state'] = state
-    TESTVAR = state
-    print("The set login state key is "+login_session['state'])
     return render_template('login.html', STATE=state)
 
 
@@ -152,9 +135,6 @@ def getUserID(email):
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
-    print("The login state is: " +login_session['state'])
-    print("THE TESTVAR IS " + str(TESTVAR))
-    print("The given state is: " + request.args['state'])
     try:
         if request.args['state'] != login_session['state']:
             response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -336,13 +316,11 @@ def fbconnect():
         remaining quotes with nothing so that it can be used directly in the
         graph api calls
     '''
-    print(result)
     # result must be decoded because it is in bytes not string
     token = result.decode("utf-8").split(',')[0].split(':')[1].replace('"', '')
 
     url = 'https://graph.facebook.com/v3.2/\
     me?access_token=%s&fields=name,id,email' % token
-    print(url.replace(" ", ""))
     h = httplib2.Http()
     result = h.request(url.replace(" ", ""), 'GET')[1]
     fb_auth_resp = result.decode('utf-8')
@@ -367,7 +345,6 @@ def fbconnect():
     # see if user exists by checking id from online user vs. this site's
     # database
     user_id = getUserID(login_session['email'])
-    print(login_session['email'])
     if not user_id:
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
@@ -442,7 +419,6 @@ def disconnect():
 def superCategoryMainPage(super_category_name):
     thisCategory = session.query(
             SuperCategory).filter_by(name=super_category_name).one()
-    print("The supercategory name  is " + thisCategory.name)
     try:
         # modified so that it only shows one genre if there are multiple with
         # the same name (e.g. two different "Fantasy" genres for different
@@ -505,8 +481,7 @@ def viewPage(super_category_name, genre_name, book_title):
                 BookItem.user_id == login_session['user_id']).one()
         except:
                 book = session.query(BookItem).filter_by(title=book_title).first()
-        print(url_for('duplicateBookViewer', super_category_name=super_category_name,
-            genre_name=genre_name, book_id=book.id, _external=True))
+
         return redirect(url_for(
             'duplicateBookViewer', super_category_name=super_category_name,
             genre_name=genre_name, book_id=book.id, _external=True).replace("http://", "https://www."))
@@ -608,7 +583,6 @@ def deleteBook(super_category_name, genre_name, book_id):
         session.delete(thisBook)
         session.commit()
         flash(title + " removed!")
-        print(title + " removed!")
         return redirect(url_for('listGenre', super_category_name = super_category_name, genre_name=genre_name, _external=True).replace("http://", "https://www."))
 
 
@@ -625,9 +599,7 @@ def editBook(super_category_name, genre_name, book_id):
         title = thisBook.title
         session.commit()
         flash(title + "'s description edited!")
-        print("Edit redirect to " + url_for('viewPage', API_KEY=CustomSearchAPIKEY,
-            super_category_name=super_category_name, genre_name=genre_name, book_title=thisBook.title,
-            _external=True).replace("http://", "https://www."))
+
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
@@ -660,7 +632,6 @@ def addBook():
                     thisBook = session.query(BookItem).filter(
                             BookItem.title == title,
                             BookItem.user_id == user_id).one()
-                    print(thisBook.title + " with a user ID of " + str(thisBook.user_id) + " and a description of " + thisBook.description)
                     flash(thisBook.title + " added!")
             else:
                 try:
@@ -701,12 +672,10 @@ def setCoverImg(super_category_name, genre_name, book_id, imgLocation):
             thisBook.imgURL is None):
         imgPathURL = str(imgLocation)
         filename = str(imgLocation).replace("/", "_").replace(":", "_").replace("http", "_")
-        print(filename)
         if(imgPathURL.startswith("https")):
             imgPathURL=imgPathURL.replace("https:/", "https://")
         elif(imgPathURL.startswith("http")):
             imgPathURL=imgPathURL.replace("http:/", "http://")
-        print(imgPathURL)
         os.chdir('/var/www/html/static/covers')
         f = open(filename, 'wb')
         f.write(urllib.request.urlopen(imgPathURL).read())
@@ -714,7 +683,6 @@ def setCoverImg(super_category_name, genre_name, book_id, imgLocation):
         session.commit()
         f.close()
         os.chdir('/var/www/html')
-        print(thisBook.imgURL)
         return redirect(url_for(
             'viewPage', API_KEY=CustomSearchAPIKEY,
             super_category_name=super_category_name,
