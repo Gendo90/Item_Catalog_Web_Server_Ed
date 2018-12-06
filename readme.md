@@ -1,15 +1,20 @@
-# Readme for "Best Books" website
+# Server Configuration of www.bestbookcollection.com
 
-## Intro
+## Overview
 
-Hello! This website is used to help users keep track of books that they have
-read or would like to read, and also hopefully introduce them to some new
-favorites. This project uses the Flask framework to handle interactions
-between back-end server code and front-end HTML, CSS, and JavaScript code, and
-keeps track of information (e.g. books, genres, etc.) using SQLAlchemy's ORM
-database methods.
+Hello! This document is intended to explain the server configuration for the
+website at www.bestbookcollection.com. The website itself uses the Flask web
+development framework and the SQLAlchemy ORM to flexibly execute and manage
+the website as it grows, and the web application itself is hosted on a remote
+Ubuntu Linux server as a WSGI app with the Apache HTTP server software. The
+SQLAlchemy ORM connects to a PostgreSQL database on the Ubuntu server to
+store and retrieve the data used to populate the website with books. Finally,
+some online, third-party "cloud" resources were used to make this website,
+including Amazon Lightsail and CloudFront, Facebook Oauth 2.0 login, and
+Google Oauth 2.0 login and custom search API, which will be explained later
+in more detail **[HERE!!!!!!!!!!!]**.
 
-## Setup
+## Server Configuration
 
 The first step in setting up this app is cloning the "fullstack-nanodegree-vm"
 repository provided by this course [here][1]. The full Flask application must
@@ -63,6 +68,8 @@ only change their own books that they have entered at this time after logging
 in to their account. Users currently have two options for logging into the
 website, because they can verify their identities and get access to their
 account using either their Google or Facebook login credentials.
+
+## Third Party Resources
 
 
 ### Example Usage
