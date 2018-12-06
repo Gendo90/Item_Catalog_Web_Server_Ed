@@ -16,58 +16,52 @@ in more detail **[HERE!!!!!!!!!!!]**.
 
 ## Server Configuration
 
-The first step in setting up this app is cloning the "fullstack-nanodegree-vm"
-repository provided by this course [here][1]. The full Flask application must
-be located in the "vagrant/catalog" directory to allow the Vagrant virtual
-machine (VM) to run it properly, so the user should place the project zip file
-there and then unzip it in that location (i.e. "vagrant/catalog").
+The server is an Amazon Web Services Lightsail instance, so it is technically
+part of the "cloud," and runs the Ubuntu 18.04 LTS version of the Linux
+Operating System (OS). The server is available at the following static IP
+address: 52.39.137.28. However, if a user tries to access the website using
+that IP address in their browser, they will not be able to login to the site
+because the URL connected to that IP address is not validated for the Google
+or Facebook Oauth 2.0 logins. Instead, the user would need to access the
+website at https://www.bestbookcollection.com to log in and access theirs and
+others' book collections. On the other hand, that IP Address **must** be used
+to access the Ubuntu server for maintenance, upgrades, etc.
 
-In order to run this "Best Books" catalog application, the user must navigate
-to the "vagrant" folder on your computer, then start their VM by entering the
-command `vagrant up`. After the VM starts, the user should navigate to the
-"catalog" directory within the "vagrant" folder.
+The two valid users for remote logins on the Ubuntu server are `ubuntu` and
+`grader`. There is another `root` user - as is standard for Linux - but that
+account cannot be logged into remotely to prevent intruders on the server from
+gaining access and permissions to all the folders and files on it. This remote
+access to `root` was disabled by changing the value of 'yes' for
+'PermitRootLogin' to 'no' in the `/etc/ssh/sshd_config` file on the server.
+Both users `ubuntu` and `grader` are given `sudo` privileges on the server,
+so they can both make changes to root files and folders. They were granted
+these privileges by adding the correct files to `/etc/sudoers.d` on the
+server.
+
+The server has been configured so that it has a firewall blocking all ports
+except for `SSH` (port 2200), `HTTP` (port 80), and `NTP` (port 123). The
+firewall used was the built-in "Uncomplicated Firewall" (`ufw`), and it was
+set to deny all incoming - other than the ports already mentioned - and allow
+all outgoing.
+
+You might note that `SSH` has been changed from the standard port of 22 to the
+non-standard port of 2200 - this change was made as the specifications
+require. This change of ports was enacted by setting the "Port" number to
+2200 in the `/etc/ssh/sshd_config` file on the server. Key-based login was
+also enforced by modifying that same file so that the value given for
+'PasswordAuthentication' was changed from 'yes' to 'no'.
+
+Finally, the software on the server is kept current by running the following
+commands if the Ubuntu login screen shows that packages could be updated. The
+first command is `sudo apt-get update`, which updates the server's information
+about different versions of software available for packages already installed.
+The second command is `sudo apt-get upgrade` to install core packages. The
+third command is `sudo apt-get dist-upgrade` to install packages for
+applications not included on the base Ubuntu install image.
 
 
-Now, the user can start the project by entering `python application.py` within
-the command line for the Vagrant VM. The catalog app will be available on
-[localhost:8000][2] once the "[application.py][3]" script has been executed in
-this manner.
+## Software Installed on Server
 
-This website is run from the "[application.py][3]" python script which acts as
-the "server" or back-end application. You can run this directly without
-creating a script to load the database with information first, but it is
-recommended that you create and run a script similar to
-"[preload_booklist_with_users.py][4]" so that the "booklistwithusers.db" is
-created **before** running the server and is populated with some books and
-their descriptions, genres, etc. You could make the entries with the user_id
-set to 1, which signifies the first user of the website, which would be
-**you**, assuming you login before anyone else. If you decide not to create a
-script to load all your books and genres into the website's database, the main
-page of the website will load only the three main "SuperCategory" entries into
-the database (e.g. "Fiction", "Non-Fiction", and "Reference") when accessed,
-without any genres or books for any users. Thus, you would need to manually
-add all the genres and books you want for yourself, because the database is
-empty other than those three SuperCategory entities.
-
-Regardless of whether or not a database is created before running the
-"[application.py][3]" server script, the script should be run from the command
-line by entering the `python application.py` command after having started the
-Vagrant VM and navigated to the directory containing the "[application.py][3]"
-file in the "vagrant/catalog" folder as described above. The directory
-structure is highly rigid for this application, because the Flask framework
-requires certain folders to be named "templates" and "static", so the server
-may not work correctly if any of the files in these folders are moved, or
-deleted, so please maintain the directory structure as it is given to ensure
-the server works properly. You can learn more about this requirement in Flask
-[here for templates][5] and [here for static files][6].
-
-After running the `python application.py` command, you should be able to access
-the website application at the "localhost:8000" address in a browser. Login is
-required for adding, editing, or deleting books or genres and each user can
-only change their own books that they have entered at this time after logging
-in to their account. Users currently have two options for logging into the
-website, because they can verify their identities and get access to their
-account using either their Google or Facebook login credentials.
 
 ## Third Party Resources
 
