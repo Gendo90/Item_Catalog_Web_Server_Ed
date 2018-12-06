@@ -62,8 +62,91 @@ applications not included on the base Ubuntu install image.
 
 ## Software Installed on Server
 
+The software necessary to run this web application that must be installed on
+the server includes Python 3.x, PostgreSQL, and Apache. Information about the
+software installation and configuration on the server follows.
+
+Python 3.6 was used for this web application, but any Python 3 distribution
+should essentially work fine. If Python is not originally installed on the
+server from factory defaults, then you can install it using the
+`sudo apt-get install python3` command. Then you must install all the packages
+listed as imports for the init.py and database_setup.py files, so that the WSGI
+application will run correctly. To install those packages, use the
+`sudo pip3 install <package>` command, where '<package>' is the name of the
+Python 3 module that is required by init.py or database_setup.py to run. If
+you do not use the `sudo` command, then the application will not work. A good
+way of checking to see if any packages are not installed is to look at the
+error.log file in /var/apache2/log directory - which should indicate if a
+Python package could not be found by the WSGI interface when trying to load
+the website.
+
+PostgreSQL must be installed on the server using the command
+`sudo apt-get install postgresql`. Once PostgreSQL is installed on the server,
+a database and user must be created so the PostgreSQL super-user (its
+equivalent of `root`) does not access the database for the books, which is bad
+practice. The database and user creation within PostgreSQL is detailed
+[here][https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e]. SQLAlchemy's DB-API (database API) 'engine' was used to connect to
+this new PostgreSQL database on the server, because the existing Python server
+code already uses SQLAlchemy and it would all need to be changed if the Python
+server code were to directly connect to the PostgreSQL database using a
+package like `psycopg2`. The format used to connect the SQLAlchemy ORM to the
+PostgreSQL database is given [here][https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql] and is practically implemented in the
+code in the repository - with the database being named 'books', the user being
+given as 'admin' and their password given as 'Aoq7M9', and the host being
+'localhost' as a convention to work with all the other code and maintain an
+internal connection between the database and the application (to prevent the
+firewall from interfering with this connection).
+
+Apache also needs to be installed on the server for this web application to
+work, and can be installed using `sudo apt-get install apache2`. After
+installing this base, vanilla version of Apache, the 'mod_wsgi' module must be
+installed so that the Apache software can correctly interpret the Flask
+framework used to make this web application and show the resulting website.
+This software can be installed with `sudo apt-get install libapache2-mod-wsgi`.
+Some configuration needs to be done before the WSGI application can work, such
+as setting the root directory of the website and the paths to some
+non-standard Python packages in the WSGI configuration file. This file is
+located on the server at `/etc/apache2/sites-enabled/000-default.conf` and
+the first line to be added is:
+`WSGIScriptAlias / /var/www/html/application.wsgi` - which sets the root
+directory for the WSGI application and the line itself must be added right
+before the `</VirtualHost>` code. The root directory is set to `/var/www/html`
+after that line is added. The next configuration objective is to set the
+python path to include that directory (since the init.py script uses the
+database_setup.py file as a module from which it imports the User, Genre, etc.
+classes of objects) as well as any directories that might include python
+packages that are not located within the main python filepath. The filepaths
+that the server uses to search for python modules are listed by entering the
+command `python3` at the Linux terminal command line and then running the
+following code block in Python 3 on the Linux machine:
+```
+import sys
+   for p in sys.path:
+       print(p)
+```
+
+
+`WSGIDaemonProcess html python-path=<PATH>`
+where `<PATH>` is given by running a
+
 
 ## Third Party Resources
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ### Example Usage
