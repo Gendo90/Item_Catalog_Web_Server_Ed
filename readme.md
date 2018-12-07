@@ -153,21 +153,105 @@ WSGI application to run correctly from that other directory.
 
 ## Third Party Resources
 
+### Authentication
+
+#### Google OAuth 2.0 Login
+
+This website uses OAuth 2.0 with Google Accounts to authenticate users so that
+they can add, edit, and delete books on the website. A user must log in on the
+https://www.bestbooks.com/login portal in order to access these features on
+the website, but the general public can still view the books that have been
+added by users.
+
+#### Facebook OAuth 2.0 Login
+
+This website uses OAuth 2.0 with Facebook to authenticate users so that
+they can add, edit, and delete books on the website. A user must log in on the
+https://www.bestbooks.com/login portal in order to access these features on
+the website, but the general public can still view the books that have been
+added by users.
 
 
+### Amazon Web Services
+
+#### Lightsail
+
+The Linux server used to host this website is an Ubuntu virtual machine
+running on an Amazon-owned server somewhere in the "cloud" and was set up
+using Amazon's Lightsail service. The server runs an OS-only image of Ubuntu
+18.04.1 (Bionic), and can only be accessed remotely by its IP address at
+52.39.137.28 using SSH on port 2200 due to its configuration described above.
+This is a static IP address, which is necessary to use CloudFront and helps
+with hosting a website.
+
+#### Route 53
+
+Route 53 is Amazon's domain name service (DNS) which allows a user to register
+a domain name and then control its DNS registry and configuration. The 'apex'
+domain that was registered was bestbookscollection.com, and the sub-domain of
+www.bestbookcollection.com is used by this website. This service allows
+management of a domain's DNS record, which was configured so that the 'apex'
+domain name points to the address of the Lightsail server instance, and then
+the sub-domain name of www.bestbookcollection.com references the CloudFront
+website that was secured using an SSL certificate and uses the 'apex' domain
+name as its origin, which will be explained in detail later.
+
+#### Certificate Manager
+
+Amazon's Certificate Manager can be used to generate SSL certificates for
+domains that a user controls, and verifies that the user controls the domain
+and is the person(s) to whom the domain is registered using either email or
+DNS verification methods. DNS verification was used in this case, since the
+Route 53 service streamlined the verification process and allowed the
+certificate to be generated quickly and easily by updating the DNS record to
+include the desired entry to validate the certificate given by Amazon. This
+certificate was necessary to enable Facebook OAuth 2.0 logins on the
+website, the Internet in general is trending towards making all sites secure
+using certificates.
+
+#### CloudFront
+
+CloudFront is an Amazon web service that allows images and other cached
+information for a website to be stored on 'edge' servers around the world, so
+that website users from different areas around the globe do not experience
+slow loading times for a website. CloudFront was a necessary addition to the
+stack because it could easily use the Amazon-generated SSL certificate to
+offer the secure connection required by the Facebook OAuth 2.0 Login API.
+CloudFront does require some configuration, with the origin domain being set
+to the 'apex' domain that references the Lightsail server's IP address, at
+bestbookcollection.com. A website at d1tq5m0w8datwq.cloudfront.net is then
+created as a 'mirror' site to the origin, but it has a valid SSL certificate
+attached. This CloudFront website is then set up to have another 'mirror'
+website at www.bestbookcollection.com, by setting an alternate CNAME entry in
+the CloudFront service for that website, and by setting an 'alias' entry in
+the Route 53 DNS record for www.bestbookcollection.com using the CloudFront
+URL as the 'alias'. The CloudFront service should be configured to allow
+all cookies and all query strings to be passed along to the origin domain, or
+the login sessions and the API calls will not work. The CloudFront website
+should also cache as little as possible for the same reasons. CloudFront
+**always** caches images as a rule to serve them faster around the world, so
+the server and webpage template code that used an external link for the book
+cover pictures needed to be modified so that it now uses an internal link to
+an image stored on the server that is downloaded when the Google Custom Search
+API is first called for a book and retrieves an external cover image URL.
 
 
+### Content
 
+#### Google Custom Search
 
-
-
-
-
-
-
-
-
-
+Google Custom Search is used by this application to find cover pictures online
+for books as they are added to the collection. This custom search essentially
+uses Google's search algorithm to search the Internet for terms inputted,
+namely a book's title, given certain parameters (such as only returning
+images as opposed to any matches), and then returns a URL to that matching
+'found' resource. This search API is powerful but has a quota drawback that
+currently limits the total number of searches to **100 queries per day** -
+which is not practical as the website grows, and is expensive to scale using
+Google's set billing plan of ~$5 per 1000 searches per day for a new, small
+website. An upgrade to using APIs available to Amazon Associates, as described
+in more detail [here][7] is a priority if the website grows, and could
+generate income instead of becoming more and more of a liability.
 
 
 ### Example Usage
@@ -338,3 +422,4 @@ opposed to saving all the book cover images on the server itself.
 [4]: https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e
 [5]: https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
 [6]: application.wsgi
+[7]: #planned-featurescurrent-limitations
