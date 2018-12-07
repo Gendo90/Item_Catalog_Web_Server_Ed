@@ -12,7 +12,7 @@ store and retrieve the data used to populate the website with books. Finally,
 some online, third-party "cloud" resources were used to make this website,
 including Amazon Lightsail and CloudFront, Facebook Oauth 2.0 login, and
 Google Oauth 2.0 login and custom search API, which will be explained later
-in more detail **[HERE!!!!!!!!!!!]**.
+in more detail [here][1].
 
 
 ## Server Configuration
@@ -76,13 +76,13 @@ Python 3.6 was used for this web application, but any Python 3 distribution
 should essentially work fine. If Python is not originally installed on the
 server from factory defaults, then you can install it using the
 `sudo apt-get install python3` command. Then you must install all the packages
-listed as imports for the init.py and database_setup.py files, so that the WSGI
-application will run correctly. To install those packages, use the
-`sudo pip3 install <package>` command, where '<package>' is the name of the
-Python 3 module that is required by init.py or database_setup.py to run. If
-you do not use the `sudo` command, then the application will not work. A good
-way of checking to see if any packages are not installed is to look at the
-error.log file in /var/apache2/log directory - which should indicate if a
+listed as imports for the [init.py][2] and [database_setup.py][3] files, so
+that the WSGI application will run correctly. To install those packages, use
+the `sudo pip3 install <package>` command, where '<package>' is the name of the
+Python 3 module that is required by [init.py][2] or [database_setup.py][3] to
+run. If you do not use the `sudo` command, then the application will not work.
+A good way of checking to see if any packages are not installed is to look at
+the error.log file in /var/apache2/log directory - which should indicate if a
 Python package could not be found by the WSGI interface when trying to load
 the website.
 
@@ -92,12 +92,12 @@ PostgreSQL must be installed on the server using the command
 a database and user must be created so the PostgreSQL super-user (its
 equivalent of `root`) does not access the database for the books, which is bad
 practice. The database and user creation within PostgreSQL is detailed
-[here][https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e]. SQLAlchemy's DB-API (database API) 'engine' was used to connect to
+[here][4]. SQLAlchemy's DB-API (database API) 'engine' was used to connect to
 this new PostgreSQL database on the server, because the existing Python server
 code already uses SQLAlchemy and it would all need to be changed if the Python
 server code were to directly connect to the PostgreSQL database using a
 package like `psycopg2`. The format used to connect the SQLAlchemy ORM to the
-PostgreSQL database is given [here][https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql] and is practically implemented in the
+PostgreSQL database is given [here][5] and is practically implemented in the
 code in the repository - with the database being named 'books', the user being
 given as 'admin' and their password given as 'Aoq7M9', and the host being
 'localhost' as a convention to work with all the other code and maintain an
@@ -123,10 +123,10 @@ which sets the root directory for the WSGI application and the line itself
 must be added right before the `</VirtualHost>` code. The root directory is
 set to `/var/www/html` after that line is added. The next configuration
 objective is to set the python path to include that directory (since the
-init.py script uses the database_setup.py file as a module from which it
-imports the User, Genre, etc. classes of objects) as well as any directories
-that might include python packages that are not located within the main
-python filepath. The filepaths that the server uses to search for python
+[init.py][2] script uses the [database_setup.py][3] file as a module from
+which it imports the User, Genre, etc. classes of objects) as well as any
+directories that might include python packages that are not located within the
+main python filepath. The filepaths that the server uses to search for python
 modules are listed by entering the command `python3` at the Linux terminal
 command line and then running the following code block in Python 3 on the
 Linux machine:
@@ -145,10 +145,10 @@ file:
 where `<PATHX>` is a filepath given by the `sys.path` output above. Below this
 line in the same file, the code `WSGIProcessGroup html` must be added so that
 the previous line works correctly. If a different folder than `/var/www/html`
-will be used to store the init.py, application.wsgi, and all other files and
-folders in this project, then the filepath to that folder should be used in
-place of `/var/www/html` in the code mentioned here to configure the WSGI
-application to run correctly from that other directory.
+will be used to store the [init.py][2], [application.wsgi][6], and all other
+files and folders in this project, then the filepath to that folder should be
+used in place of `/var/www/html` in the code mentioned here to configure the
+WSGI application to run correctly from that other directory.
 
 
 ## Third Party Resources
@@ -332,10 +332,9 @@ that could produce revenue. So another upgrade would be to start storing and
 retrieving images on an Amazon S3 'bucket' or other cloud storage service, as
 opposed to saving all the book cover images on the server itself.
 
-[1]: https://github.com/udacity/fullstack-nanodegree-vm
-[2]: http://localhost:8000
-[3]: application.py
-[4]: preload_booklist_with_users.py
-[5]:
-https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-ii-templates
-[6]: http://exploreflask.com/en/latest/static.html
+[1]: #third-party-resources
+[2]: init.py
+[3]: database_setup.py
+[4]: https://medium.com/coding-blocks/creating-user-database-and-adding-access-on-postgresql-8bfcd2f4a91e
+[5]: https://docs.sqlalchemy.org/en/latest/core/engines.html#postgresql
+[6]: application.wsgi
