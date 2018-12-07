@@ -14,6 +14,7 @@ including Amazon Lightsail and CloudFront, Facebook Oauth 2.0 login, and
 Google Oauth 2.0 login and custom search API, which will be explained later
 in more detail **[HERE!!!!!!!!!!!]**.
 
+
 ## Server Configuration
 
 The server is an Amazon Web Services Lightsail instance, so it is technically
@@ -27,6 +28,7 @@ website at https://www.bestbookcollection.com to log in and access theirs and
 others' book collections. On the other hand, that IP Address **must** be used
 to access the Ubuntu server for maintenance, upgrades, etc.
 
+
 The two valid users for remote logins on the Ubuntu server are `ubuntu` and
 `grader`. There is another `root` user - as is standard for Linux - but that
 account cannot be logged into remotely to prevent intruders on the server from
@@ -38,11 +40,13 @@ so they can both make changes to root files and folders. They were granted
 these privileges by adding the correct files to `/etc/sudoers.d` on the
 server.
 
+
 The server has been configured so that it has a firewall blocking all ports
 except for `SSH` (port 2200), `HTTP` (port 80), and `NTP` (port 123). The
 firewall used was the built-in "Uncomplicated Firewall" (`ufw`), and it was
 set to deny all incoming - other than the ports already mentioned - and allow
 all outgoing.
+
 
 You might note that `SSH` has been changed from the standard port of 22 to the
 non-standard port of 2200 - this change was made as the specifications
@@ -50,6 +54,7 @@ require. This change of ports was enacted by setting the "Port" number to
 2200 in the `/etc/ssh/sshd_config` file on the server. Key-based login was
 also enforced by modifying that same file so that the value given for
 'PasswordAuthentication' was changed from 'yes' to 'no'.
+
 
 Finally, the software on the server is kept current by running the following
 commands if the Ubuntu login screen shows that packages could be updated. The
@@ -66,6 +71,7 @@ The software necessary to run this web application that must be installed on
 the server includes Python 3.x, PostgreSQL, and Apache. Information about the
 software installation and configuration on the server follows.
 
+
 Python 3.6 was used for this web application, but any Python 3 distribution
 should essentially work fine. If Python is not originally installed on the
 server from factory defaults, then you can install it using the
@@ -79,6 +85,7 @@ way of checking to see if any packages are not installed is to look at the
 error.log file in /var/apache2/log directory - which should indicate if a
 Python package could not be found by the WSGI interface when trying to load
 the website.
+
 
 PostgreSQL must be installed on the server using the command
 `sudo apt-get install postgresql`. Once PostgreSQL is installed on the server,
@@ -97,6 +104,7 @@ given as 'admin' and their password given as 'Aoq7M9', and the host being
 internal connection between the database and the application (to prevent the
 firewall from interfering with this connection).
 
+
 Apache also needs to be installed on the server for this web application to
 work, and can be installed using `sudo apt-get install apache2`. After
 installing this base, vanilla version of Apache, the 'mod_wsgi' module must be
@@ -108,26 +116,39 @@ as setting the root directory of the website and the paths to some
 non-standard Python packages in the WSGI configuration file. This file is
 located on the server at `/etc/apache2/sites-enabled/000-default.conf` and
 the first line to be added is:
-`WSGIScriptAlias / /var/www/html/application.wsgi` - which sets the root
-directory for the WSGI application and the line itself must be added right
-before the `</VirtualHost>` code. The root directory is set to `/var/www/html`
-after that line is added. The next configuration objective is to set the
-python path to include that directory (since the init.py script uses the
-database_setup.py file as a module from which it imports the User, Genre, etc.
-classes of objects) as well as any directories that might include python
-packages that are not located within the main python filepath. The filepaths
-that the server uses to search for python modules are listed by entering the
-command `python3` at the Linux terminal command line and then running the
-following code block in Python 3 on the Linux machine:
+
+`WSGIScriptAlias / /var/www/html/application.wsgi`
+
+which sets the root directory for the WSGI application and the line itself
+must be added right before the `</VirtualHost>` code. The root directory is
+set to `/var/www/html` after that line is added. The next configuration
+objective is to set the python path to include that directory (since the
+init.py script uses the database_setup.py file as a module from which it
+imports the User, Genre, etc. classes of objects) as well as any directories
+that might include python packages that are not located within the main
+python filepath. The filepaths that the server uses to search for python
+modules are listed by entering the command `python3` at the Linux terminal
+command line and then running the following code block in Python 3 on the
+Linux machine:
 ```
 import sys
    for p in sys.path:
        print(p)
 ```
+After the list of filepaths is generated, they can then be used to source
+Python modules for the WSGI app by entering the following line **above** the
+`WSGIScriptAlias` line in the `/etc/apache2/sites-enabled/000-default.conf`
+file:
 
+`WSGIDaemonProcess html python-path=/var/www/html:<PATH1>:<PATH2>:<PATH3>`
 
-`WSGIDaemonProcess html python-path=<PATH>`
-where `<PATH>` is given by running a
+where `<PATHX>` is a filepath given by the `sys.path` output above. Below this
+line in the same file, the code `WSGIProcessGroup html` must be added so that
+the previous line works correctly. If a different folder than `/var/www/html`
+will be used to store the init.py, application.wsgi, and all other files and
+folders in this project, then the filepath to that folder should be used in
+place of `/var/www/html` in the code mentioned here to configure the WSGI
+application to run correctly from that other directory.
 
 
 ## Third Party Resources
@@ -154,11 +175,11 @@ where `<PATH>` is given by running a
 #### Login
 
 The user can login from the main page of the website, accessible at
-"localhost:8000", by clicking on the "Login" button on the right side of the
-header. This button will bring the user to a page where they can select to
-login using either their Google or their Facebook account. Once they have
-successfully logged in using one of these accounts, the page will change to
-show their profile picture and let them know that they have logged in
+"www.bestbookcollection.com", by clicking on the "Login" button on the right
+side of the header. This button will bring the user to a page where they can
+select to login using either their Google or their Facebook account. Once they
+have successfully logged in using one of these accounts, the page will change
+to show their profile picture and let them know that they have logged in
 successfully, and then will redirect to the main page of the website. The user
 will now have access to their books and genres and the capability to add more
 books and genres to their account. The "Login" button on the right side of the
