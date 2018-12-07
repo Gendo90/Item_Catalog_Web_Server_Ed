@@ -251,40 +251,43 @@ Each book has a JSON endpoint that gives the same information as the book
 viewer webpage. A user can access this JSON information by navigating to
 nearly the same path as the book viewer, they would just replace the "view"
 part of the path with "JSON" For example, if a user wanted to retrieve the
-JSON information for a book with id=9, genre="Fantasy", and
-superCategory="Fiction", they would be able to view the book at
-http://localhost:8000/Fiction/Fantasy/9/view and to get the desired JSON
-information, they would need to replace the "view" with "JSON" as mentioned
-earlier, so they would navigate to http://localhost:8000/Fiction/Fantasy/9/JSON
-This path structure should work with all books in the catalog.
+JSON information for a book with id=63, genre="Fantasy", and
+superCategory="Fiction", they would navigate to
+https://www.bestbookcollection.com/Fiction/Fantasy/63/JSON
+This path structure should work with all books in the catalog. The book id
+numbers are given by the 'genre' JSON endpoint explained below, which contains
+the book id numbers and titles along with other information, so a user would
+logically request the JSON for the genre the book is contained in first, and
+then get the book information using this book JSON endpoint with the book id
+that matches the title or author or whatever other information they desire.
 
 #### Genre JSON
 
 Each genre has a JSON endpoint as well, that gives information about all the
 books within it. The genres are categorized by their names, so you would
 navigate to the webpage to view all the books in a given genre (e.g.
-http://localhost:8000/Fiction/Fantasy/) and then append "JSON" on the end of
-that path to retrieve the JSON information for that entire genre. For example,
-to get all the books contained within the "Fantasy" genre listed in a single
-JSON file, you could navigate to http://localhost:8000/Fiction/Fantasy/JSON
-This path structure should work with all genres in the catalog, and will
-show you books from different users in the same genre and duplicate books
-in a given genre as well.
+https://www.bestbookcollection.com/Fiction/Fantasy/) and then append "JSON" on
+the end of that path to retrieve the JSON information for that entire genre.
+For example, to get all the books contained within the "Fantasy" genre listed
+in a single JSON file, you could navigate to
+https://www.bestbookcollection.com/Fiction/Fantasy/JSON This path structure
+should work with all genres in the catalog, and will show you books from
+different users in the same genre and duplicate books in a given genre as well.
 
 #### SuperCategory JSON
 
 Each SuperCategory has a JSON endpoint that gives information about all the
 genres within it. The SuperCategories are categorized by their names, so you
 would navigate to the webpage to view all the genres in a given SuperCategory
-(e.g. http://localhost:8000/Fiction/) and then append "JSON" on the end of
-that path to retrieve the JSON information for that entire SuperCategory. For
-example, to get all the genres contained within the "Fiction" SuperCategory
-listed in a single JSON file, you could navigate to
-http://localhost:8000/Fiction/JSON This path structure should work with all
-three SuperCategories in the catalog, and will show you genres from different
-users and list each genre name once (no duplicates in the JSON file even if
-multiple users added the same genre and they are technically different in the
-database).
+(e.g. https://www.bestbookcollection.com/Fiction/) and then append "JSON" on
+the end of that path to retrieve the JSON information for that entire
+SuperCategory. For example, to get all the genres contained within the
+"Fiction" SuperCategory listed in a single JSON file, you could navigate to
+https://www.bestbookcollection.com/Fiction/JSON This path structure should
+work with all three SuperCategories in the catalog, and will show you genres
+from different users and list each genre name once (no duplicates in the JSON
+file even if multiple users added the same genre and they are technically
+different in the database).
 
 ## Planned Features/Current Limitations
 
@@ -318,6 +321,16 @@ API was used during development because it is easier to access than Amazon's
 Associate APIs, since the website needs a formal address to even register as
 an Amazon Associate. The documentation from Google is more comprehensive and
 makes their API easier to implement as well.
+
+Additionally, there were some issues loading images directly using Amazon's
+CloudFront service, so the images and links to the Amazon website when the
+Amazon API is used instead of the Google Custom Search API in the future would
+need to be saved either on the server or more likely using cloud storage such
+as Amazon's S3 service, so that the images could be retrieved from a virtually
+unlimited online storage service and have saved links to the Amazon website
+that could produce revenue. So another upgrade would be to start storing and
+retrieving images on an Amazon S3 'bucket' or other cloud storage service, as
+opposed to saving all the book cover images on the server itself.
 
 [1]: https://github.com/udacity/fullstack-nanodegree-vm
 [2]: http://localhost:8000
