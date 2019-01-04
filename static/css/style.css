@@ -82,6 +82,22 @@ button.login {
   flex-direction: row;
 }
 
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.footer_text {
+  text-align: right;
+  color: #718eb1;
+  padding: 5px;
+}
+
+a.footer_link:hover {
+  color: yellow;
+}
+
 .main_container {
   display: flex;
   flex-direction: row;
