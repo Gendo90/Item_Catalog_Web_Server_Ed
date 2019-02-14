@@ -435,6 +435,27 @@ def viewPage(super_category_name, genre_name, book_id):
         login_session['user_id']
     except KeyError:
         login_session['user_id'] = -0.1
+
+    # test to see if the genre name is actually the user name, then route to
+    # the 'my collection' page!
+    if(login_session['username']==genre_name):
+        user_id = login_session['user_id']
+
+        userBooks = session.query(BookItem).join(
+            User, User.id == BookItem.user_id).filter(
+            User.id == user_id).group_by(BookItem.title)
+
+        book = session.query(BookItem).filter_by(id=book_id).one()
+        user = session.query(User).filter(User.id==user_id).one()
+
+        return render_template(
+            'user-collection-book-viewer.html',
+            API_KEY=CustomSearchAPIKEY,
+            super_category_name=super_category_name, genre=user.name,
+            genreBooks=userBooks, book=book,
+            author=book.author[0], userID = book.user_id)
+
+
     # new plan - get duplicate book titles first, then check book titles vs
     # duplicate book titles, then remove duplicate book titles
     # update this genre query so that it returns all books for the given
@@ -527,6 +548,26 @@ def duplicateBookViewer(super_category_name, genre_name, book_id):
                 'duplicate-books-viewer-only.html',
                 super_category_name=super_category_name, book=book,
                 bookCopies=bookCopies, genre=genre_name, author=authors)
+
+# webpage listing books within a particular user's collection
+@app.route("/<string:super_category_name>/<int:user_id>/")
+def listUserBooks(super_category_name, user_id):
+    # ensures there is a login session user id to compare against
+    try:
+        login_session['user_id']
+    except KeyError:
+        login_session['user_id'] = -0.1
+
+    userBooks = session.query(BookItem).join(
+        User, User.id == BookItem.user_id).filter(
+        User.id == user_id).group_by(BookItem.title)
+
+    user = session.query(User).filter(User.id==user_id).one()
+
+    return render_template(
+        'user-booklist.html',
+        super_category_name=super_category_name, genre=user.name,
+        bookList=userBooks)
 
 
 # inaccessible webpage (uses POST method only) that deletes a book from a genre

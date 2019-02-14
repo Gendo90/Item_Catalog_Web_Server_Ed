@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Tells the browser what the title of this page should be. -->
+  <title>Best Books Catalog</title>
+  <meta name="description" content="A website listing books that users
+  recommend based on their own reading experiences, and why they recommend
+  these books, categorized by genre.">
+  <meta name="website author" content="Patrick Gendotti">
+
+  <!-- Load the page styles. -->
+  <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet" type='text/css'>
+</head>
+<body>
+  <div class="container">
+    <div class=loggedinheading>
+      <!--GHOST DIV FOR SPACING SO HEADER IS CENTERED!-->
+      <p class=text_blend> Login </p>
+    </div>
+    <div class=origheading>
+      <h1>Best Books!</h1>
+      <p>A place to review great reads, as suggested by users like you!</p>
+    </div>
+    <div class=loggedinheading>
+      {% if session['email'] %}
+      <a href="{{url_for('disconnect')}}"><button class=header_btn type=button>Logout</button></a>
+      {% else %}
+      <a href="{{url_for('loginPage')}}"><button class=header_btn type=button>Login</button></a>
+      {% endif %}
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+
+    <ul>
+      {% for message in messages %}
+      <li>{{message}}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+  <div class=main_container>
+    <div class=sidebar>
+      <h2>{{genre}}</h2>
+      <div class=sidebar_line></div>
+      {% if session['email'] %}
+      <div class=add_book><a href='{{url_for('addBook')}}'><button class="new_book" type=button>Add Another Book!</button></a></div>
+      {% endif %}
+                                      {% for book in bookList %}
+        <div class=sidebar_links>
+          <h3><a href={{url_for('viewPage', super_category_name=super_category_name, genre_name=genre, book_id=book.id)}}>{{book.title}}</a></h3>
+            <br />
+        </div>
+                                      {% endfor %}
+    </div>
+
+    <div class=main_content>
+    </div>
+  </div>
+
+  <div class=footer>
+    <h4 class=footer_text>2018-2019</h4>
+    <h4 class=footer_text>&#8226;</h4>
+    <h4 class=footer_text>Designed and built by <a class=footer_link href=http://www.patrickgendotti.info>Patrick Gendotti</a></h4>
+  </div>
+
+
+</body>
+</html>
