@@ -75,7 +75,7 @@
         <div class=book_info>
           Author: {{author}}
           <p class="description" id="current_description">Description: {{book.description}}</p>
-          <form action="./edit" method="POST" id="edit_desc_form">
+          <form action="../{{book.id}}/edit" method="POST" id="edit_desc_form">
             <p>Description:</p>
             <textarea name="updated_description" rows=8 form="edit_desc_form">{{book.description}}</textarea>
             <input class="submit_description" type="submit"/>
@@ -137,10 +137,10 @@
   $(".delete").on("click", function check_delete(){
     delete_response = confirm("Are you sure you want to delete this book?");
     if (delete_response === true) {
-      $.post('./delete');
+      $.post('https://www.bestbookcollection.com/{{super_category_name}}/{{genre}}/{{book.id}}/delete');
       setTimeout(function(){
-        window.location.replace('/{{super_category_name}}/{{genre}}');
-      }, 1000);
+        window.location.replace("{{url_for('listUserBooks', super_category_name=super_category_name, user_id=book.user_id, _external=True).replace('http://', 'https://www.')}}"
+      )}, 1000);
     };
   });
 

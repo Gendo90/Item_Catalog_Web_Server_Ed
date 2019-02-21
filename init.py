@@ -623,7 +623,7 @@ def deleteBook(super_category_name, genre_name, book_id):
     thisBook = session.query(BookItem).filter_by(id=book_id).one()
     # verifies that the book belongs to the user who sent the POST request
     # to set the image
-	if(login_session['user_id'] == thisBook.user_id and login_session['username']==genre_name):
+    if(login_session['user_id'] == thisBook.user_id and login_session['username']==genre_name):
         title = thisBook.title
         session.delete(thisBook)
         session.commit()
@@ -645,7 +645,7 @@ def editBook(super_category_name, genre_name, book_id):
     thisBook = session.query(BookItem).filter_by(id=book_id).one()
     # verifies that the book belongs to the user who sent the POST request
     # to change the description
-	elif(login_session['user_id'] == thisBook.user_id):
+    if(login_session['user_id']==thisBook.user_id):
         thisBook.description = request.form['updated_description']
         title = thisBook.title
         session.commit()
