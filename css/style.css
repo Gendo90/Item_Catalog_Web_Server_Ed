@@ -113,6 +113,7 @@ a.footer_link:hover {
   background-color: #718eb1;
   text-align: center;
   color: #b8cf69;
+  overflow-y: auto;
 }
 
 .sidebar_line, .login_line, .FB_login_line {
