@@ -380,10 +380,6 @@ users' books, based on genre names that match genres in your personal
 collection, as well as some random books that will be featured on the public
 area of the website for any site visitors.
 
-Soon you will be able to view books and genres **only** in your collection and
-nothing from any other user's collection by following a "My Collection" link
-when logged in!
-
 There will also be a footer added to the website displaying information like
 contact information, year(s) during which the website was developed and
 maintained, and possibly some quick links to pages like the home page and the
