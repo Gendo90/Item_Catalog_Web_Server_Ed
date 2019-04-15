@@ -167,6 +167,7 @@ def gconnect():
     h = httplib2.Http()
     g_byte_resp = h.request(url, 'GET')[1]
     result = json.loads(str(g_byte_resp.decode('utf-8')))
+
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error')), 500)
@@ -202,13 +203,21 @@ def gconnect():
     login_session['gplus_id'] = gplus_id
 
     # Get user info
-    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    userinfo_url = "https://www.googleapis.com/oauth2/v2/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-
     data = answer.json()
+
+    # Get profile name, etc. - update as of 4-15-19
+    # due to Google changing how OAuth2.0 works for user profiles
+    # needs to query a different API (People API using Google+)
+    profile_url = "https://www.googleapis.com/plus/v1/people/{}".format(data['id'])
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer_again = requests.get(profile_url, params=params)
+    profile_data = answer_again.json()
+
     login_session['provider'] = 'google'
-    login_session['username'] = data['name']
+    login_session['username'] = profile_data['displayName']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
