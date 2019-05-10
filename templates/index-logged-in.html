@@ -68,6 +68,16 @@
     </div>
 
     <div class=main_content>
+        <h3 class=book_title>Featured:</h3>
+        <div class=featured_flex_container>
+            {% for i, book in featured %}
+            <div class='book_img_holder_featured'>
+                <a href={{url_for('viewPage', super_category_name=super_cats[i], genre_name=genres[i], book_id=book.id)}}>
+                    <img class=book_img src="{{book.imgURL}}" title="{{book.title}}" />
+                </a>
+            </div>
+            {% endfor %}
+        </div>
     </div>
   </div>
 
