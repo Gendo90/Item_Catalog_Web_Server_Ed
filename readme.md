@@ -377,13 +377,11 @@ different in the database).
 
 A planned, upcoming feature is the ability to view random selections of other
 users' books, based on genre names that match genres in your personal
-collection, as well as some random books that will be featured on the public
-area of the website for any site visitors.
+collection.
 
-There will also be a footer added to the website displaying information like
-contact information, year(s) during which the website was developed and
-maintained, and possibly some quick links to pages like the home page and the
-"My Collection" pages and possibly recently visited pages on the site.
+The footer will also eventually some quick links to pages like the home page,
+the "My Collection" pages, and possibly recently visited pages on the site
+(e.g. a "back" button).
 
 Another planned upgrade would allow more books to be added each day, while
 enabling a revenue stream as an Amazon Associate. This upgrade consists of
