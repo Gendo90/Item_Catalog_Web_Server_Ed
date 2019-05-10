@@ -13,7 +13,7 @@ import string
 
 # import packages to prevent caching on cloudfront
 from flask import make_response
-from datetime import datetime
+import datetime
 import functools
 
 # import packages for google oauth login
@@ -70,7 +70,7 @@ def get_featured_books():
     all_books = session.query(BookItem).all()
 
     #make the list of BookItems to be featured
-    while(len(featured_books)<=14):
+    while(len(featured_books)<=15):
         taken_index = random.randint(0, len(all_books)-1)
         if(all_books[taken_index].title not in [book.title for book in featured_books]):
             featured_books.append(all_books.pop(taken_index))
@@ -81,6 +81,10 @@ def get_featured_books():
         featured_categories.append(item.genre.super_category.name)
 
     current_day = datetime.date.today()
+
+
+get_featured_books()
+print('started!')
 
 # Main page for the website
 @app.route('/')
@@ -113,7 +117,7 @@ def mainPage():
 
     return render_template('index-logged-in.html',
     featured=enumerate(featured_books), genres=featured_genres,
-    super_cats=featured_categories))
+    super_cats=featured_categories)
 
 
 # login page for the website
