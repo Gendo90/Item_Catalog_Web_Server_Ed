@@ -67,6 +67,11 @@ featured_categories = []
 
 #setup 'Featured Books' daily recurring function
 def get_featured_books():
+    #reset the 'featured' book containers
+    featured_books = []
+    featured_genres = []
+    featured_categories = []
+
     all_books = session.query(BookItem).all()
 
     #make the list of BookItems to be featured

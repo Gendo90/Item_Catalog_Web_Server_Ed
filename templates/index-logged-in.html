@@ -74,7 +74,7 @@
             <div class=book_img_holder_featured>
                 <a href={{url_for('viewPage', super_category_name=super_cats[i], genre_name=genres[i], book_title=book.title)}}>
                     <img class=book_img src="{{url_for('static', filename='covers/'+book.imgURL)}}" title="{{book.title}}" />
-                <a/>
+                </a>
             </div>
         {% endfor %}
         </div>
