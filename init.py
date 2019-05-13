@@ -460,10 +460,14 @@ def disconnect():
         login_session['user_id'] = -0.1
         del login_session['provider']
         flash("You have successfully been logged out.")
-        return render_template('index-logged-in.html')
+        return render_template('index-logged-in.html',
+        featured=enumerate(featured_books), genres=featured_genres,
+        super_cats=featured_categories)
     else:
         flash("You were not logged in")
-        return render_template('index-logged-in.html')
+        return render_template('index-logged-in.html',
+        featured=enumerate(featured_books), genres=featured_genres,
+        super_cats=featured_categories)
 
 
 # Three super-categories that link to different pages - the string name should
