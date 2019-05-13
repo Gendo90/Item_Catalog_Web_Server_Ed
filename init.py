@@ -46,7 +46,7 @@ with app.open_resource('client_secrets.json') as f:
 	byte_output = f.read()
 	CLIENT_ID = json.loads(str(byte_output.decode('utf-8')))['web']['client_id']
 APPLICATION_NAME = "Book Collector App"
-
+1
 engine = create_engine(
         'postgresql+psycopg2://admin:Aoq7M9@localhost/books')
 Base.metadata.bind = engine
@@ -67,6 +67,11 @@ featured_categories = []
 
 #setup 'Featured Books' daily recurring function
 def get_featured_books():
+    #declare global variables
+    global featured_books
+    global featured_genres
+    global featured_categories
+    global current_day
     #reset the 'featured' book containers
     featured_books = []
     featured_genres = []
@@ -86,10 +91,10 @@ def get_featured_books():
         featured_categories.append(item.genre.super_category.name)
 
     current_day = datetime.date.today()
+    #return featured_books, this_day
 
 
 get_featured_books()
-print('started!')
 
 # Main page for the website
 @app.route('/')
@@ -117,8 +122,12 @@ def mainPage():
     except KeyError:
         login_session['user_id'] = -0.1
 
+    #declare global variables
+    global featured_books
+    global current_day
     if(featured_books==[] or current_day!=datetime.date.today()):
         get_featured_books()
+        print(featured_books, current_day)
 
     return render_template('index-logged-in.html',
     featured=enumerate(featured_books), genres=featured_genres,
