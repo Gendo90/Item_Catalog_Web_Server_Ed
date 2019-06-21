@@ -52,7 +52,7 @@ button.login {
   padding-bottom: 1px;
   padding-left: 10px;
   padding-right: 10px;
-  background-color: #718eb1;
+  background-color: #0f3d71;
   text-align: center;
   color: #b8cf69;
   font-family: Arial;
@@ -65,7 +65,7 @@ button.login {
 }
 
 .text_blend {
-  color: #718eb1;
+  color: #0f3d71;
 }
 
 .origheading {
@@ -97,7 +97,7 @@ button.login {
 
 .footer_text {
   text-align: right;
-  color: #718eb1;
+  color: #0f3d71;
   padding: 5px;
 }
 
@@ -117,7 +117,7 @@ a.footer_link:hover {
   min-width: 120px;
   max-width: 200px;
   margin-top: 10px;
-  background-color: #718eb1;
+  background-color: #0f3d71;
   text-align: center;
   color: #b8cf69;
   overflow-y: auto;
@@ -151,7 +151,7 @@ div.sidebar_links {
   height: 300px;
   margin: auto;
   margin-top: calc(50vh - 150px);
-  background-color: #718eb1;
+  background-color: #0f3d71;
   text-align: center;
   color: #b8cf69;
   border-color: black;
