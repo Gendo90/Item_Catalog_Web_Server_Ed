@@ -125,7 +125,7 @@ function sendTokenToServer() {
         // Function used to help render the custom Google Login button
         function render() {
           gapi.signin.render('signinButton', {
-            'scope':"openid email",
+            'scope':"openid email profile",
             'clientid':"396893510299-c63590mldo9t9ftg4rb0di77edpfnmj8.apps.googleusercontent.com",
             'redirecturi':"postmessage",
             'accesstype':"offline",

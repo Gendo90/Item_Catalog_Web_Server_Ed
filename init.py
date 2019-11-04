@@ -212,6 +212,10 @@ def gconnect():
     h = httplib2.Http()
     g_byte_resp = h.request(url, 'GET')[1]
     result = json.loads(str(g_byte_resp.decode('utf-8')))
+    #params = {'scope':'openid email profile'}
+    #googl_resp = requests.get(url, params=params)
+    #result = googl_resp.json()
+    print(result)
 
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
@@ -256,13 +260,17 @@ def gconnect():
     # Get profile name, etc. - update as of 4-15-19
     # due to Google changing how OAuth2.0 works for user profiles
     # needs to query a different API (People API using Google+)
-    profile_url = "https://www.googleapis.com/plus/v1/people/{}".format(data['id'])
-    params = {'access_token': credentials.access_token, 'alt': 'json'}
-    answer_again = requests.get(profile_url, params=params)
+    profile_url = "https://people.googleapis.com/v1/people/me"
+    params = {'personFields':'names', 'alt': 'json'}
+    headers = {'Authorization':'Bearer {}'.format(credentials.access_token), 'Accept':'application/json'}
+    answer_again = requests.get(profile_url, params=params, headers=headers)
+    #print(answer_again)
     profile_data = answer_again.json()
 
     login_session['provider'] = 'google'
-    login_session['username'] = profile_data['displayName']
+    #print(data)
+    #print(profile_data)
+    login_session['username'] = profile_data['names'][0]['displayName']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
